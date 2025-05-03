@@ -13,7 +13,6 @@ public class TollCalculator
     public const int LEVEL_3_TOLL_FEE = 18;
     public const int MAX_DAILY_TOLL_FEE = 60;
     public const int MAX_INTERVAL_MINUTES = 59;
-    public const string UNDEFINED_VEHICLE_EXCEPTION_MESSAGE = "The vehicle is undefined.";
     public const string SEVERAL_DATES_EXCEPTION_MESSAGE = "All time stamps must be from the same date.";
 
     private static readonly VehicleType[] TollFreeVehicleTypes =
@@ -29,11 +28,11 @@ public class TollCalculator
     /**
      * Calculate the total toll fee for one day
      *
-     * @param vehicle - the vehicle
+     * @param vehicleType - the vehicle type
      * @param timeStamps - date and time of all passes on one day
      * @return - the total toll fee for that day
      */
-    public int GetDailyTollFee(Vehicle vehicle, DateTime[] timeStampArray)
+    public int GetDailyTollFee(VehicleType vehicleType, DateTime[] timeStampArray)
     {
         // Check if the array is empty
         if (timeStampArray.Length == 0) return MIN_TOLL_FEE;
@@ -48,7 +47,7 @@ public class TollCalculator
         }
 
         // Check if the vehicle or the date is toll free
-        if (IsVehicleOrDateTollFree(vehicle, timeStamps.First())) return MIN_TOLL_FEE;
+        if (IsVehicleOrDateTollFree(vehicleType, timeStamps.First())) return MIN_TOLL_FEE;
 
         // ---- Calculate the total toll fee ----
         var intervalStartTimeStamp = timeStamps.First().AddMinutes(-MAX_INTERVAL_MINUTES-1); // Start value guaranteed to be before the first time stamp
@@ -91,14 +90,14 @@ public class TollCalculator
     /**
      * Calculate the toll fee for one timestamp
      *
-     * @param vehicle - the vehicle
+     * @param vehicleType - the vehicle type
      * @param timeStamp - One date and time for a pass
      * @return - the toll fee for that timestamp
      */
-    public int GetTimelyTollFee(Vehicle vehicle, DateTime timeStamp)
+    public int GetTimelyTollFee(VehicleType vehicleType, DateTime timeStamp)
     {
         // Check if the vehicle or the date is toll free
-        if (IsVehicleOrDateTollFree(vehicle, timeStamp)) return MIN_TOLL_FEE;
+        if (IsVehicleOrDateTollFree(vehicleType, timeStamp)) return MIN_TOLL_FEE;
 
         return GetTimelyTollFee(timeStamp);
     }
@@ -106,17 +105,9 @@ public class TollCalculator
     /**
      * Checks if the Vehicle or Date should be toll free
      */
-    public bool IsVehicleOrDateTollFree(Vehicle vehicle, DateTime date) => IsVehicleTollFree(vehicle) || IsDateTollFree(date);
+    public bool IsVehicleOrDateTollFree(VehicleType vehicleType, DateTime date) => IsVehicleTollFree(vehicleType) || IsDateTollFree(date);
 
-    private bool IsVehicleTollFree(Vehicle vehicle)
-    {
-        if (vehicle == null)
-        {
-            throw new ArgumentException(UNDEFINED_VEHICLE_EXCEPTION_MESSAGE);
-        }
-        
-        return TollFreeVehicleTypes.Contains(vehicle.VehicleType);
-    }
+    private bool IsVehicleTollFree(VehicleType vehicleType) => TollFreeVehicleTypes.Contains(vehicleType);
 
     private int GetTimelyTollFee(DateTime timeStamp)
     {

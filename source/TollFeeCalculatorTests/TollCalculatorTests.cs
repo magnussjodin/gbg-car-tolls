@@ -11,14 +11,14 @@ public class TollCalculatorTests
     public void GetDailyTollFee_ShouldReturn0ForAnEmptyTimeStampArray()
     {
         var tollCalculator = new TollCalculator();
-        var vehicle = GetVehicleThatHasFee();
+        var vehicleType = GetVehicleTypeThatHasFee();
         var timeStamps = new DateTime[]{};
         var fee = INVALID_TOLL_FEE;
         var expectedFee = TollCalculator.MIN_TOLL_FEE;
 
         try
         {
-            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+            fee = tollCalculator.GetDailyTollFee(vehicleType, timeStamps);
         }
         catch (System.Exception)
         {
@@ -31,7 +31,7 @@ public class TollCalculatorTests
     public void GetDailyTollFee_ShouldThrowExceptionIfNotAllTimeStampsFromSameDate()
     {
         var tollCalculator = new TollCalculator();
-        var vehicle = GetVehicleThatHasFee();
+        var vehicleType = GetVehicleTypeThatHasFee();
         var timeStamps = new DateTime[]
         {
             new DateTime(2013, 1, 2, 0, 0, 0),
@@ -43,7 +43,7 @@ public class TollCalculatorTests
 
         try
         {
-            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+            fee = tollCalculator.GetDailyTollFee(vehicleType, timeStamps);
         }
         catch (System.Exception ex)
         {
@@ -58,7 +58,7 @@ public class TollCalculatorTests
     public void GetDailyTollFee_ShouldTakeMaxFeeInEachStarted60MinutePeriod()
     {
         var tollCalculator = new TollCalculator();
-        var vehicle = GetVehicleThatHasFee();
+        var vehicleType = GetVehicleTypeThatHasFee();
 
         // A period with maximum fee for the last time stamp
         var timeStamps = new DateTime[]
@@ -72,7 +72,7 @@ public class TollCalculatorTests
         var expectedFee = TollCalculator.LEVEL_3_TOLL_FEE; // 18 for 1st period
         try
         {
-            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+            fee = tollCalculator.GetDailyTollFee(vehicleType, timeStamps);
         }
         catch (System.Exception)
         {
@@ -90,7 +90,7 @@ public class TollCalculatorTests
         fee = INVALID_TOLL_FEE;
         try
         {
-            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+            fee = tollCalculator.GetDailyTollFee(vehicleType, timeStamps);
         }
         catch (System.Exception)
         {
@@ -102,7 +102,7 @@ public class TollCalculatorTests
     public void GetDailyTollFee_ShouldReturnAllMaxFeesAddedUp()
     {
         var tollCalculator = new TollCalculator();
-        var vehicle = GetVehicleThatHasFee();
+        var vehicleType = GetVehicleTypeThatHasFee();
 
         // A period with maximum fee for the last time stamp
         var timeStamps = new DateTime[]
@@ -123,7 +123,7 @@ public class TollCalculatorTests
         var expectedFee = TollCalculator.LEVEL_3_TOLL_FEE + TollCalculator.LEVEL_3_TOLL_FEE + TollCalculator.LEVEL_1_TOLL_FEE; 
         try
         {
-            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+            fee = tollCalculator.GetDailyTollFee(vehicleType, timeStamps);
         }
         catch (System.Exception)
         {
@@ -136,7 +136,7 @@ public class TollCalculatorTests
     public void GetDailyTollFee_ShouldReturn60AsDailyMaxFee()
     {
         var tollCalculator = new TollCalculator();
-        var vehicle = GetVehicleThatHasFee();
+        var vehicleType = GetVehicleTypeThatHasFee();
 
         // A period with maximum fee for the last time stamp
         var timeStamps = new DateTime[]
@@ -156,7 +156,7 @@ public class TollCalculatorTests
         var expectedFee = TollCalculator.MAX_DAILY_TOLL_FEE; // The sum of all max fees exceeds 60
         try
         {
-            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+            fee = tollCalculator.GetDailyTollFee(vehicleType, timeStamps);
         }
         catch (System.Exception)
         {
@@ -169,7 +169,7 @@ public class TollCalculatorTests
     public void GetDailyTollFee_ShouldHandleUnorderedTimeStampsCorrectly()
     {
         var tollCalculator = new TollCalculator();
-        var vehicle = GetVehicleThatHasFee();
+        var vehicleType = GetVehicleTypeThatHasFee();
 
         // A period with maximum fee for the last time stamp
         var timeStamps = new DateTime[]
@@ -188,7 +188,7 @@ public class TollCalculatorTests
         var expectedFee = TollCalculator.LEVEL_3_TOLL_FEE + TollCalculator.LEVEL_3_TOLL_FEE + TollCalculator.LEVEL_1_TOLL_FEE; 
         try
         {
-            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+            fee = tollCalculator.GetDailyTollFee(vehicleType, timeStamps);
         }
         catch (System.Exception)
         {
@@ -198,31 +198,10 @@ public class TollCalculatorTests
     }
         
     [Fact]
-    public void IsVehicleOrDateTollFree_ShouldThrowExceptionIfVehicleIsNull()
-    {
-        var tollCalculator = new TollCalculator();
-        Vehicle? vehicle = null;
-        var timeStamp = GetTimeStampThatHasFee();
-        bool? expectedAnswer = null, answer = null;
-
-        try
-        {
-            answer = tollCalculator.IsVehicleOrDateTollFree(vehicle, timeStamp);    
-        }
-        catch (System.Exception ex)
-        {
-            Assert.IsType<ArgumentException>(ex);
-            Assert.Equal(TollCalculator.UNDEFINED_VEHICLE_EXCEPTION_MESSAGE, ex.Message);
-        }
-
-        Assert.Equal(expectedAnswer, answer);
-    }
-        
-    [Fact]
     public void IsVehicleOrDateTollFree_ShouldBeFalseIfDateHasNoFee()
     {
         var tollCalculator = new TollCalculator();
-        var vehicle = GetVehicleThatHasFee();
+        var vehicleType = GetVehicleTypeThatHasFee();
         bool? expectedAnswer = true, answer = null;
 
         // Saturdays and Sundays should have no fee
@@ -231,7 +210,7 @@ public class TollCalculatorTests
             .First(date => date.DayOfWeek == DayOfWeek.Saturday); // First Saturday of February 2013
         try
         {
-            answer = tollCalculator.IsVehicleOrDateTollFree(vehicle, aSaturday);    
+            answer = tollCalculator.IsVehicleOrDateTollFree(vehicleType, aSaturday);    
         }
         catch (System.Exception)
         {
@@ -241,7 +220,7 @@ public class TollCalculatorTests
         var aSunday = aSaturday.AddDays(1); // First Sunday of February 2013
         try
         {
-            answer = tollCalculator.IsVehicleOrDateTollFree(vehicle, aSunday);    
+            answer = tollCalculator.IsVehicleOrDateTollFree(vehicleType, aSunday);    
         }
         catch (System.Exception)
         {
@@ -253,7 +232,7 @@ public class TollCalculatorTests
         {
             try
             {
-                answer = tollCalculator.IsVehicleOrDateTollFree(vehicle, weekDay);    
+                answer = tollCalculator.IsVehicleOrDateTollFree(vehicleType, weekDay);    
             }
             catch (System.Exception)
             {
@@ -269,7 +248,7 @@ public class TollCalculatorTests
         var tollCalculator = new TollCalculator();
         var timeStamp = GetTimeStampThatHasFee();
 
-        var fee = tollCalculator.GetTimelyTollFee(vehicle, timeStamp);
+        var fee = tollCalculator.GetTimelyTollFee(vehicle.VehicleType, timeStamp);
 
         Assert.Equal(hasFee, fee > TollCalculator.MIN_TOLL_FEE);
     }
@@ -279,22 +258,23 @@ public class TollCalculatorTests
     public void GetTimelyTollFee_ShouldReturnFeeAccordingToTimePeriodOfDay(DateTime startTimeStamp, DateTime endTimeStamp, int fee)
     {
         var tollCalculator = new TollCalculator();
-        var vehicle = GetVehicleThatHasFee();
+        var vehicleType = GetVehicleTypeThatHasFee();
 
         // Check if the fee is valid for all minutes in the time period
         for (var timeStamp = startTimeStamp; timeStamp <= endTimeStamp; timeStamp = timeStamp.AddMinutes(1))
         {
-            var actualFee = tollCalculator.GetTimelyTollFee(vehicle, timeStamp);
+            var actualFee = tollCalculator.GetTimelyTollFee(vehicleType, timeStamp);
             Assert.Equal(fee, actualFee);
         }
     }
 
-    private Vehicle GetVehicleThatHasFee()
+    private VehicleType GetVehicleTypeThatHasFee()
     {
         return GetVehicleAndHasFeeTestData()
-            .Select(vehicleAndHasFee => new { Vehicle = vehicleAndHasFee[0] as Vehicle, HasFee = (bool)vehicleAndHasFee[1] })
+            .Select(item => new { Vehicle = (Vehicle)item[0], HasFee = (bool)item[1] })
             .First(item => item.HasFee)
-            .Vehicle ?? throw new ArgumentException("No vehicle with fee found.");
+            .Vehicle
+            .VehicleType;
     }
 
     private DateTime GetTimeStampThatHasFee()
