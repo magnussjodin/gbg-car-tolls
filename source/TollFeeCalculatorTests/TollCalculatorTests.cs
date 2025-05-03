@@ -62,7 +62,10 @@ public class TollCalculatorTests
 
     private DateTime GetTimeStampThatHasFee()
     {
-        return new DateTime(2013, 1, 2, 8, 0, 0);
+        return GetTimelyTollFeeTestData()
+            .Select(timeData => new { StartTimeDate = (DateTime)timeData[0], Fee = (int)timeData[2] })
+            .First(item => item.Fee > 0)
+            .StartTimeDate;
     }
 
     public static IEnumerable<object[]> GetVehicleAndHasFeeTestData()
