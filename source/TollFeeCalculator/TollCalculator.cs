@@ -79,7 +79,14 @@ public class TollCalculator
         return totalFee;
     }
 
-    public int GetTimelyTollFee(DateTime timeStamp, Vehicle vehicle)
+    /**
+     * Calculate the toll fee for one timestamp
+     *
+     * @param vehicle - the vehicle
+     * @param timeStamp - One date and time for a pass
+     * @return - the toll fee for that timestamp
+     */
+    public int GetTimelyTollFee(Vehicle vehicle, DateTime timeStamp)
     {
         // Check if the vehicle or the date is toll free
         if (IsVehicleOrDateTollFree(vehicle, timeStamp)) return MIN_TOLL_FEE;
@@ -87,7 +94,10 @@ public class TollCalculator
         return GetTimelyTollFee(timeStamp);
     }
 
-    public bool IsVehicleOrDateTollFree(Vehicle vehicle, DateTime timeStamp) => IsVehicleTollFree(vehicle) || IsDateTollFree(timeStamp);
+    /**
+     * Checks if the Vehicle or Date should be toll free
+     */
+    public bool IsVehicleOrDateTollFree(Vehicle vehicle, DateTime date) => IsVehicleTollFree(vehicle) || IsDateTollFree(date);
 
     private bool IsVehicleTollFree(Vehicle vehicle)
     {
@@ -121,13 +131,13 @@ public class TollCalculator
         else return MIN_TOLL_FEE;
     }
 
-    private Boolean IsDateTollFree(DateTime timeStamp)
+    private Boolean IsDateTollFree(DateTime date)
     {
-        int year = timeStamp.Year;
-        int month = timeStamp.Month;
-        int day = timeStamp.Day;
+        int year = date.Year;
+        int month = date.Month;
+        int day = date.Day;
 
-        if (timeStamp.DayOfWeek == DayOfWeek.Saturday || timeStamp.DayOfWeek == DayOfWeek.Sunday) return true;
+        if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) return true;
 
         if (year == 2013)
         {

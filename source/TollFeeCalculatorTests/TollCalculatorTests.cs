@@ -269,7 +269,7 @@ public class TollCalculatorTests
         var tollCalculator = new TollCalculator();
         var timeStamp = GetTimeStampThatHasFee();
 
-        var fee = tollCalculator.GetTimelyTollFee(timeStamp, vehicle);
+        var fee = tollCalculator.GetTimelyTollFee(vehicle, timeStamp);
 
         Assert.Equal(hasFee, fee > TollCalculator.MIN_TOLL_FEE);
     }
@@ -284,7 +284,7 @@ public class TollCalculatorTests
         // Check if the fee is valid for all minutes in the time period
         for (var timeStamp = startTimeStamp; timeStamp <= endTimeStamp; timeStamp = timeStamp.AddMinutes(1))
         {
-            var actualFee = tollCalculator.GetTimelyTollFee(timeStamp, vehicle);
+            var actualFee = tollCalculator.GetTimelyTollFee(vehicle, timeStamp);
             Assert.Equal(fee, actualFee);
         }
     }
