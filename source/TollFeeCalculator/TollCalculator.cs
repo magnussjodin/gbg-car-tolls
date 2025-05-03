@@ -16,6 +16,11 @@ public class TollCalculator
     public int GetDailyTollFee(Vehicle vehicle, DateTime[] dates)
     {
         if (dates.Length == 0) return 0;
+
+        if (dates.Any(timeStamp => timeStamp.Date != dates[0].Date))
+        {
+            throw new ArgumentException("All time stamps must be from the same date.");
+        }
         
         DateTime intervalStart = dates[0];
         int totalFee = 0;

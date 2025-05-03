@@ -25,6 +25,32 @@ public class TollCalculatorTests
     }
         
     [Fact]
+    public void GetDailyTollFee_ShouldRaiseExceptionIfNotAllTimeStampsFromSameDate()
+    {
+        var tollCalculator = new TollCalculator();
+        var vehicle = GetVehicleThatHasFee();
+        var timeStamps = new DateTime[]
+        {
+            new DateTime(2013, 1, 2, 0, 0, 0),
+            new DateTime(2013, 1, 2, 16, 45, 0),
+            new DateTime(2013, 1, 3, 6, 30, 0) // Different date
+        };
+        int fee = -1;
+
+        try
+        {
+            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+        }
+        catch (System.Exception ex)
+        {
+            Assert.IsType<ArgumentException>(ex);
+            Assert.Equal("All time stamps must be from the same date.", ex.Message);
+        }
+
+        Assert.Equal(-1, fee);
+    }
+        
+    [Fact]
     public void GetTimelyTollFee_ShouldReturn0IfVehicleIsNull()
     {
         var tollCalculator = new TollCalculator();
