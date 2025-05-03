@@ -13,7 +13,9 @@ public class TollCalculator
     public const int LEVEL_3_TOLL_FEE = 18;
     public const int MAX_DAILY_TOLL_FEE = 60;
     public const int MAX_INTERVAL_MINUTES = 59;
-    
+    public const string UNDEFINED_VEHICLE_EXCEPTION_MESSAGE = "The vehicle is undefined.";
+    public const string SEVERAL_DATES_EXCEPTION_MESSAGE = "All time stamps must be from the same date.";
+
 
     /**
      * Calculate the total toll fee for one day
@@ -33,7 +35,7 @@ public class TollCalculator
         // Check if the timestamps cover more than one date
         if (timeStamps.Any(timeStamp => timeStamp.Date != timeStamps.First().Date))
         {
-            throw new ArgumentException("All time stamps must be from the same date.");
+            throw new ArgumentException(SEVERAL_DATES_EXCEPTION_MESSAGE);
         }
 
         // Check if the vehicle or the date is toll free
@@ -77,11 +79,22 @@ public class TollCalculator
         return totalFee;
     }
 
-    private bool IsVehicleOrDateTollFree(Vehicle vehicle, DateTime timeStamp) => IsVehicleTollFree(vehicle) || IsDateTollFree(timeStamp);
+    public int GetTimelyTollFee(DateTime timeStamp, Vehicle vehicle)
+    {
+        // Check if the vehicle or the date is toll free
+        if (IsVehicleOrDateTollFree(vehicle, timeStamp)) return MIN_TOLL_FEE;
+
+        return GetTimelyTollFee(timeStamp);
+    }
+
+    public bool IsVehicleOrDateTollFree(Vehicle vehicle, DateTime timeStamp) => IsVehicleTollFree(vehicle) || IsDateTollFree(timeStamp);
 
     private bool IsVehicleTollFree(Vehicle vehicle)
     {
-        if (vehicle == null) return true;
+        if (vehicle == null)
+        {
+            throw new ArgumentException(UNDEFINED_VEHICLE_EXCEPTION_MESSAGE);
+        }
         String vehicleType = vehicle.GetVehicleType();
         return vehicleType.Equals(TollFreeVehicles.Motorbike.ToString()) ||
                vehicleType.Equals(TollFreeVehicles.Tractor.ToString()) ||
@@ -89,14 +102,6 @@ public class TollCalculator
                vehicleType.Equals(TollFreeVehicles.Diplomat.ToString()) ||
                vehicleType.Equals(TollFreeVehicles.Foreign.ToString()) ||
                vehicleType.Equals(TollFreeVehicles.Military.ToString());
-    }
-
-    public int GetTimelyTollFee(DateTime timeStamp, Vehicle vehicle)
-    {
-        // Check if the vehicle or the date is toll free
-        if (IsVehicleOrDateTollFree(vehicle, timeStamp)) return MIN_TOLL_FEE;
-
-        return GetTimelyTollFee(timeStamp);
     }
 
     private int GetTimelyTollFee(DateTime timeStamp)

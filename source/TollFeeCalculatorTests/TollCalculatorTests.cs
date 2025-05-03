@@ -48,7 +48,7 @@ public class TollCalculatorTests
         catch (System.Exception ex)
         {
             Assert.IsType<ArgumentException>(ex);
-            Assert.Equal("All time stamps must be from the same date.", ex.Message);
+            Assert.Equal(TollCalculator.SEVERAL_DATES_EXCEPTION_MESSAGE, ex.Message);
         }
 
         Assert.Equal(expectedFee, fee);
@@ -198,38 +198,67 @@ public class TollCalculatorTests
     }
         
     [Fact]
-    public void GetTimelyTollFee_ShouldReturn0IfVehicleIsNull()
+    public void IsVehicleOrDateTollFree_ShouldThrowExceptionIfVehicleIsNull()
     {
         var tollCalculator = new TollCalculator();
-        Vehicle vehicle = null;
+        Vehicle? vehicle = null;
         var timeStamp = GetTimeStampThatHasFee();
-        var expectedFee = TollCalculator.MIN_TOLL_FEE;
+        bool? expectedAnswer = null, answer = null;
 
-        var fee = tollCalculator.GetTimelyTollFee(timeStamp, vehicle);
+        try
+        {
+            answer = tollCalculator.IsVehicleOrDateTollFree(vehicle, timeStamp);    
+        }
+        catch (System.Exception ex)
+        {
+            Assert.IsType<ArgumentException>(ex);
+            Assert.Equal(TollCalculator.UNDEFINED_VEHICLE_EXCEPTION_MESSAGE, ex.Message);
+        }
 
-        Assert.Equal(expectedFee, fee);
+        Assert.Equal(expectedAnswer, answer);
     }
         
     [Fact]
-    public void GetTimelyTollFee_ShouldReturn0IfDateHasNoFee()
+    public void IsVehicleOrDateTollFree_ShouldBeFalseIfDateHasNoFee()
     {
         var tollCalculator = new TollCalculator();
         var vehicle = GetVehicleThatHasFee();
-        var expectedFee = TollCalculator.MIN_TOLL_FEE;
+        bool? expectedAnswer = true, answer = null;
 
         // Saturdays and Sundays should have no fee
         var aSaturday = Enumerable.Range(1, 7)
             .Select(day => new DateTime(2013, 2, 1).AddDays(day - 1))
             .First(date => date.DayOfWeek == DayOfWeek.Saturday); // First Saturday of February 2013
-        Assert.Equal(expectedFee, tollCalculator.GetTimelyTollFee(aSaturday, vehicle));
+        try
+        {
+            answer = tollCalculator.IsVehicleOrDateTollFree(vehicle, aSaturday);    
+        }
+        catch (System.Exception)
+        {
+        }
+        Assert.Equal(expectedAnswer, answer);
 
         var aSunday = aSaturday.AddDays(1); // First Sunday of February 2013
-        Assert.Equal(expectedFee, tollCalculator.GetTimelyTollFee(aSunday, vehicle));
+        try
+        {
+            answer = tollCalculator.IsVehicleOrDateTollFree(vehicle, aSunday);    
+        }
+        catch (System.Exception)
+        {
+        }
+        Assert.Equal(expectedAnswer, answer);
 
         // Some weekdays have no fee
         foreach (var weekDay in GetWeekDaysThatHasNoFee())
         {
-            Assert.Equal(expectedFee, tollCalculator.GetTimelyTollFee(weekDay, vehicle));
+            try
+            {
+                answer = tollCalculator.IsVehicleOrDateTollFree(vehicle, weekDay);    
+            }
+            catch (System.Exception)
+            {
+            }
+            Assert.Equal(expectedAnswer, answer);
         }
     }
     
@@ -260,12 +289,12 @@ public class TollCalculatorTests
         }
     }
 
-    private Vehicle? GetVehicleThatHasFee()
+    private Vehicle GetVehicleThatHasFee()
     {
         return GetVehicleAndHasFeeTestData()
             .Select(vehicleAndHasFee => new { Vehicle = vehicleAndHasFee[0] as Vehicle, HasFee = (bool)vehicleAndHasFee[1] })
             .First(item => item.HasFee)
-            .Vehicle;
+            .Vehicle ?? throw new ArgumentException("No vehicle with fee found.");
     }
 
     private DateTime GetTimeStampThatHasFee()
