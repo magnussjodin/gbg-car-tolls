@@ -1,0 +1,21 @@
+# Ignore build output directories
+bin/
+obj/
+
+# Ignore Visual Studio temporary files
+*.user
+*.suo
+
+# Ignore Rider/JetBrains IDE files
+.idea/
+*.iml
+
+# Ignore compiled DLLs and executables
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# Ignore other temporary files
+*.log
+*.vs/
