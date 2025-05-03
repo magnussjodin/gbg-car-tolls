@@ -19,11 +19,13 @@ public class TollCalculator
      * @param timeStamps - date and time of all passes on one day
      * @return - the total toll fee for that day
      */
-    public int GetDailyTollFee(Vehicle vehicle, DateTime[] timeStamps)
+    public int GetDailyTollFee(Vehicle vehicle, DateTime[] timeStampArray)
     {
-        if (timeStamps.Length == 0) return MIN_TOLL_FEE;
+        if (timeStampArray.Length == 0) return MIN_TOLL_FEE;
         
-        if (timeStamps.Any(timeStamp => timeStamp.Date != timeStamps[0].Date))
+        var timeStamps = timeStampArray.OrderBy(timeStamp => timeStamp); // Sort the time stamps in ascending order
+
+        if (timeStamps.Any(timeStamp => timeStamp.Date != timeStamps.First().Date))
         {
             throw new ArgumentException("All time stamps must be from the same date.");
         }
