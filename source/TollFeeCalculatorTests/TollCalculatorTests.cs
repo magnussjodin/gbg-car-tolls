@@ -51,6 +51,118 @@ public class TollCalculatorTests
     }
         
     [Fact]
+    public void GetDailyTollFee_ShouldTakeMaxFeeInEachStarted60MinutePeriod()
+    {
+        var tollCalculator = new TollCalculator();
+        var vehicle = GetVehicleThatHasFee();
+
+        // A period with maximum fee for the last time stamp
+        var timeStamps = new DateTime[]
+        {
+            new DateTime(2013, 1, 2, 6, 29, 0), // 8
+            new DateTime(2013, 1, 2, 6, 30, 0), // 13
+            new DateTime(2013, 1, 2, 7, 0, 0), // 18, the maximum fee in this time period
+        };
+
+        int fee = -1;
+        var expectedFee = 18;
+        try
+        {
+            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+        }
+        catch (System.Exception)
+        {
+        }
+        Assert.Equal(expectedFee, fee);
+
+        // A period with maximum fee for the last time stamp
+        timeStamps = new DateTime[]
+        {
+            new DateTime(2013, 1, 2, 7, 59, 0), // 18, the maximum fee in this time period
+            new DateTime(2013, 1, 2, 8, 0, 0), // 13
+            new DateTime(2013, 1, 2, 8, 30, 0), // 8
+        };
+
+        fee = -1;
+        try
+        {
+            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+        }
+        catch (System.Exception)
+        {
+        }
+        Assert.Equal(expectedFee, fee);
+    }
+        
+        
+    [Fact]
+    public void GetDailyTollFee_ShouldReturnAllMaxFeesAddedUp()
+    {
+        var tollCalculator = new TollCalculator();
+        var vehicle = GetVehicleThatHasFee();
+
+        // A period with maximum fee for the last time stamp
+        var timeStamps = new DateTime[]
+        {
+            new DateTime(2013, 1, 2, 6, 29, 0), // 8
+            new DateTime(2013, 1, 2, 6, 30, 0), // 13
+            new DateTime(2013, 1, 2, 7, 0, 0), // 18, the maximum fee in 1st time period
+
+            new DateTime(2013, 1, 2, 7, 59, 0), // 18, the maximum fee in 2nd time period
+            new DateTime(2013, 1, 2, 8, 0, 0), // 13
+            new DateTime(2013, 1, 2, 8, 30, 0), // 8
+
+            new DateTime(2013, 1, 2, 14, 44, 0), // 8, the maximum fee in 3rd time period
+        };
+
+        int fee = -1;
+        var expectedFee = 18 + 18 + 8; // 18 for the first period, 18 for the second period and 8 for the third period
+        try
+        {
+            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+        }
+        catch (System.Exception)
+        {
+        }
+
+        Assert.Equal(expectedFee, fee);
+    }
+        
+        
+    [Fact]
+    public void GetDailyTollFee_ShouldReturn60AsDailyMaxFee()
+    {
+        var tollCalculator = new TollCalculator();
+        var vehicle = GetVehicleThatHasFee();
+
+        // A period with maximum fee for the last time stamp
+        var timeStamps = new DateTime[]
+        {
+            new DateTime(2013, 1, 2, 6, 29, 0), // 8
+            new DateTime(2013, 1, 2, 7, 0, 0), // 18, the maximum fee in 1st time period
+
+            new DateTime(2013, 1, 2, 7, 59, 0), // 18, the maximum fee in 2nd time period
+            new DateTime(2013, 1, 2, 8, 30, 0), // 8
+
+            new DateTime(2013, 1, 2, 14, 44, 0), // 8, the maximum fee in 3rd time period
+
+            new DateTime(2013, 1, 2, 16, 59, 0), // 18, the maximum fee in 4th time period
+        };
+
+        int fee = -1;
+        var expectedFee = 60; // The sum of all max fees exceeds 60
+        try
+        {
+            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+        }
+        catch (System.Exception)
+        {
+        }
+        
+        Assert.Equal(expectedFee, fee);
+    }
+        
+    [Fact]
     public void GetTimelyTollFee_ShouldReturn0IfVehicleIsNull()
     {
         var tollCalculator = new TollCalculator();

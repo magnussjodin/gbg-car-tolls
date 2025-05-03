@@ -16,34 +16,46 @@ public class TollCalculator
     public int GetDailyTollFee(Vehicle vehicle, DateTime[] timeStamps)
     {
         if (timeStamps.Length == 0) return 0;
-
+        
         if (timeStamps.Any(timeStamp => timeStamp.Date != timeStamps[0].Date))
         {
             throw new ArgumentException("All time stamps must be from the same date.");
         }
-        
-        DateTime intervalStart = timeStamps[0];
-        int totalFee = 0;
+
+        var intervalStartTimeStamp = timeStamps.First().AddMinutes(-60); // Start value guaranteed to be before the first time stamp
+        var intervalMaxFee = 0;
+        var totalFee = 0;
         foreach (DateTime timeStamp in timeStamps)
         {
-            int nextFee = GetTimelyTollFee(timeStamp, vehicle);
-            int tempFee = GetTimelyTollFee(intervalStart, vehicle);
+            int fee = GetTimelyTollFee(timeStamp, vehicle);
 
-            long diffInMillies = timeStamp.Millisecond - intervalStart.Millisecond;
-            long minutes = diffInMillies/1000/60;
-
-            if (minutes <= 60)
+            // TimeStamp is outside the 60 minute interval.
+            // Add the max fee of the last interval to the total fee and start a new interval
+            if ((timeStamp - intervalStartTimeStamp).TotalMinutes >= 60)
             {
-                if (totalFee > 0) totalFee -= tempFee;
-                if (nextFee >= tempFee) tempFee = nextFee;
-                totalFee += tempFee;
+                totalFee += intervalMaxFee;
+                totalFee = Math.Min(totalFee, 60); // Cap the total fee to 60
+
+                // Max fee is reached, no need to calculate further
+                if (totalFee == 60)
+                {
+                    return totalFee;
+                }
+
+                intervalStartTimeStamp = timeStamp;
+                intervalMaxFee = fee;
             }
-            else
+            // TimeStamp is inside the 60 minute interval.
+            // Calculate the max fee
+            else            
             {
-                totalFee += nextFee;
+                intervalMaxFee = Math.Max(intervalMaxFee, fee);
             }
         }
-        if (totalFee > 60) totalFee = 60;
+
+        totalFee += intervalMaxFee;
+        totalFee = Math.Min(totalFee, 60); // Cap the total fee to 60
+
         return totalFee;
     }
 
