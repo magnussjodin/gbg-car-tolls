@@ -8,7 +8,7 @@ public class TollCalculatorTests
     private const int INVALID_TOLL_FEE = -1;
 
     [Fact]
-    public void GetDailyTollFee_ShouldReturn0ForAnEmptyTimeStampList()
+    public void GetDailyTollFee_ShouldReturn0ForAnEmptyTimeStampArray()
     {
         var tollCalculator = new TollCalculator();
         var vehicle = GetVehicleThatHasFee();
@@ -28,7 +28,7 @@ public class TollCalculatorTests
     }
         
     [Fact]
-    public void GetDailyTollFee_ShouldRaiseExceptionIfNotAllTimeStampsFromSameDate()
+    public void GetDailyTollFee_ShouldThrowExceptionIfNotAllTimeStampsFromSameDate()
     {
         var tollCalculator = new TollCalculator();
         var vehicle = GetVehicleThatHasFee();
@@ -69,7 +69,7 @@ public class TollCalculatorTests
         };
 
         int fee = INVALID_TOLL_FEE;
-        var expectedFee = 18;
+        var expectedFee = TollCalculator.LEVEL_3_TOLL_FEE; // 18 for 1st period
         try
         {
             fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
@@ -119,7 +119,8 @@ public class TollCalculatorTests
         };
 
         int fee = INVALID_TOLL_FEE;
-        var expectedFee = 18 + 18 + 8; // 18 for the first period, 18 for the second period and 8 for the third period
+        // 18 for 1st and 2nd period, 8 for 3rd period
+        var expectedFee = TollCalculator.LEVEL_3_TOLL_FEE + TollCalculator.LEVEL_3_TOLL_FEE + TollCalculator.LEVEL_1_TOLL_FEE; 
         try
         {
             fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
@@ -183,7 +184,8 @@ public class TollCalculatorTests
         };
 
         int fee = INVALID_TOLL_FEE;
-        var expectedFee = 18 + 18 + 8; // 18 for the first period, 18 for the second period and 8 for the third period
+        // 18 for 1st and 2nd period, 8 for 3rd period
+        var expectedFee = TollCalculator.LEVEL_3_TOLL_FEE + TollCalculator.LEVEL_3_TOLL_FEE + TollCalculator.LEVEL_1_TOLL_FEE; 
         try
         {
             fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
@@ -285,15 +287,15 @@ public class TollCalculatorTests
         // (startTimeStamp, endTimeStamp, fee):
         // The fee should be valid for all minutes >= startTimeStamp and <= endTimeStamp
         yield return new object[] { new DateTime(2013, 1, 2, 0, 0, 0), new DateTime(2013, 1, 2, 5, 59, 0), TollCalculator.MIN_TOLL_FEE };
-        yield return new object[] { new DateTime(2013, 1, 2, 6, 0, 0), new DateTime(2013, 1, 2, 6, 29, 0), 8 };
-        yield return new object[] { new DateTime(2013, 1, 2, 6, 30, 0), new DateTime(2013, 1, 2, 6, 59, 0), 13 };
-        yield return new object[] { new DateTime(2013, 1, 2, 7, 0, 0), new DateTime(2013, 1, 2, 7, 59, 0), 18 };
-        yield return new object[] { new DateTime(2013, 1, 2, 8, 0, 0), new DateTime(2013, 1, 2, 8, 29, 0), 13 };
-        yield return new object[] { new DateTime(2013, 1, 2, 8, 30, 0), new DateTime(2013, 1, 2, 14, 59, 0), 8 };
-        yield return new object[] { new DateTime(2013, 1, 2, 15, 0, 0), new DateTime(2013, 1, 2, 15, 29, 0), 13 };
-        yield return new object[] { new DateTime(2013, 1, 2, 15, 30, 0), new DateTime(2013, 1, 2, 16, 59, 0), 18 };
-        yield return new object[] { new DateTime(2013, 1, 2, 17, 0, 0), new DateTime(2013, 1, 2, 17, 59, 0), 13 };
-        yield return new object[] { new DateTime(2013, 1, 2, 18, 0, 0), new DateTime(2013, 1, 2, 18, 29, 0), 8 };
+        yield return new object[] { new DateTime(2013, 1, 2, 6, 0, 0), new DateTime(2013, 1, 2, 6, 29, 0), TollCalculator.LEVEL_1_TOLL_FEE };
+        yield return new object[] { new DateTime(2013, 1, 2, 6, 30, 0), new DateTime(2013, 1, 2, 6, 59, 0), TollCalculator.LEVEL_2_TOLL_FEE };
+        yield return new object[] { new DateTime(2013, 1, 2, 7, 0, 0), new DateTime(2013, 1, 2, 7, 59, 0), TollCalculator.LEVEL_3_TOLL_FEE };
+        yield return new object[] { new DateTime(2013, 1, 2, 8, 0, 0), new DateTime(2013, 1, 2, 8, 29, 0), TollCalculator.LEVEL_2_TOLL_FEE };
+        yield return new object[] { new DateTime(2013, 1, 2, 8, 30, 0), new DateTime(2013, 1, 2, 14, 59, 0), TollCalculator.LEVEL_1_TOLL_FEE };
+        yield return new object[] { new DateTime(2013, 1, 2, 15, 0, 0), new DateTime(2013, 1, 2, 15, 29, 0), TollCalculator.LEVEL_2_TOLL_FEE };
+        yield return new object[] { new DateTime(2013, 1, 2, 15, 30, 0), new DateTime(2013, 1, 2, 16, 59, 0), TollCalculator.LEVEL_3_TOLL_FEE };
+        yield return new object[] { new DateTime(2013, 1, 2, 17, 0, 0), new DateTime(2013, 1, 2, 17, 59, 0), TollCalculator.LEVEL_2_TOLL_FEE };
+        yield return new object[] { new DateTime(2013, 1, 2, 18, 0, 0), new DateTime(2013, 1, 2, 18, 29, 0), TollCalculator.LEVEL_1_TOLL_FEE };
         yield return new object[] { new DateTime(2013, 1, 2, 18, 30, 0), new DateTime(2013, 1, 2, 23, 59, 0), TollCalculator.MIN_TOLL_FEE };
     }
 
