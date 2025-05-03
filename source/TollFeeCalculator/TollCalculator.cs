@@ -16,6 +16,15 @@ public class TollCalculator
     public const string UNDEFINED_VEHICLE_EXCEPTION_MESSAGE = "The vehicle is undefined.";
     public const string SEVERAL_DATES_EXCEPTION_MESSAGE = "All time stamps must be from the same date.";
 
+    private static readonly VehicleType[] TollFreeVehicleTypes =
+    [
+        VehicleType.Motorbike,
+        VehicleType.Tractor,
+        VehicleType.Emergency,
+        VehicleType.Diplomat,
+        VehicleType.Foreign,
+        VehicleType.Military
+    ];
 
     /**
      * Calculate the total toll fee for one day
@@ -105,13 +114,8 @@ public class TollCalculator
         {
             throw new ArgumentException(UNDEFINED_VEHICLE_EXCEPTION_MESSAGE);
         }
-        String vehicleType = vehicle.GetVehicleType();
-        return vehicleType.Equals(TollFreeVehicles.Motorbike.ToString()) ||
-               vehicleType.Equals(TollFreeVehicles.Tractor.ToString()) ||
-               vehicleType.Equals(TollFreeVehicles.Emergency.ToString()) ||
-               vehicleType.Equals(TollFreeVehicles.Diplomat.ToString()) ||
-               vehicleType.Equals(TollFreeVehicles.Foreign.ToString()) ||
-               vehicleType.Equals(TollFreeVehicles.Military.ToString());
+        
+        return TollFreeVehicleTypes.Contains(vehicle.VehicleType);
     }
 
     private int GetTimelyTollFee(DateTime timeStamp)
@@ -154,15 +158,5 @@ public class TollCalculator
             }
         }
         return false;
-    }
-
-    private enum TollFreeVehicles
-    {
-        Motorbike = 0,
-        Tractor = 1,
-        Emergency = 2,
-        Diplomat = 3,
-        Foreign = 4,
-        Military = 5
     }
 }
