@@ -15,6 +15,8 @@ public class TollCalculator
 
     public int GetDailyTollFee(Vehicle vehicle, DateTime[] dates)
     {
+        if (dates.Length == 0) return 0;
+        
         DateTime intervalStart = dates[0];
         int totalFee = 0;
         foreach (DateTime date in dates)

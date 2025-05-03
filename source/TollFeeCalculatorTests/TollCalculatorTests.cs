@@ -6,6 +6,25 @@ using TollFeeCalculator;
 public class TollCalculatorTests
 {
     [Fact]
+    public void GetDailyTollFee_ShouldReturn0ForAnEmptyTimeStampList()
+    {
+        var tollCalculator = new TollCalculator();
+        var vehicle = GetVehicleThatHasFee();
+        var timeStamps = new DateTime[]{};
+        int fee = -1;
+
+        try
+        {
+            fee = tollCalculator.GetDailyTollFee(vehicle, timeStamps);
+        }
+        catch (System.Exception)
+        {
+        }
+
+        Assert.Equal(0, fee);
+    }
+        
+    [Fact]
     public void GetTimelyTollFee_ShouldReturn0IfVehicleIsNull()
     {
         var tollCalculator = new TollCalculator();
