@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "type": "coreclr",
+            "request": "launch",
+            "name": "Launch TollFeeCalculator",
+            "program": "${workspaceFolder}/source/TollFeeCalculator/bin/Debug/net9.0/${input:executableName}.dll",
+            "preLaunchTask": "build TollFeeCalculator",
+            "cwd": "${workspaceFolder}/source/TollFeeCalculator",
+            "stopAtEntry": false
+        },
+        {
+            "type": "coreclr",
+            "request": "launch",
+            "name": "Launch TollFeeCalculatorTests",
+            "program": "${workspaceFolder}/source/TollFeeCalculatorTests/bin/Debug/net9.0/${input:testAssembly}.dll",
+            "preLaunchTask": "build TollFeeCalculatorTests",
+            "cwd": "${workspaceFolder}/source/TollFeeCalculatorTests",
+            "stopAtEntry": false
+        }
+    ],
+    "inputs": [
+        {
+            "type": "promptString",
+            "id": "testAssembly",
+            "description": "Enter the name of the test assembly to debug (e.g., TollFeeCalculatorTests)"
+        }
+    ]
+}
