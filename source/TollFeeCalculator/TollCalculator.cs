@@ -9,27 +9,27 @@ public class TollCalculator
      * Calculate the total toll fee for one day
      *
      * @param vehicle - the vehicle
-     * @param dates   - date and time of all passes on one day
+     * @param timeStamps - date and time of all passes on one day
      * @return - the total toll fee for that day
      */
 
-    public int GetDailyTollFee(Vehicle vehicle, DateTime[] dates)
+    public int GetDailyTollFee(Vehicle vehicle, DateTime[] timeStamps)
     {
-        if (dates.Length == 0) return 0;
+        if (timeStamps.Length == 0) return 0;
 
-        if (dates.Any(timeStamp => timeStamp.Date != dates[0].Date))
+        if (timeStamps.Any(timeStamp => timeStamp.Date != timeStamps[0].Date))
         {
             throw new ArgumentException("All time stamps must be from the same date.");
         }
         
-        DateTime intervalStart = dates[0];
+        DateTime intervalStart = timeStamps[0];
         int totalFee = 0;
-        foreach (DateTime date in dates)
+        foreach (DateTime timeStamp in timeStamps)
         {
-            int nextFee = GetTimelyTollFee(date, vehicle);
+            int nextFee = GetTimelyTollFee(timeStamp, vehicle);
             int tempFee = GetTimelyTollFee(intervalStart, vehicle);
 
-            long diffInMillies = date.Millisecond - intervalStart.Millisecond;
+            long diffInMillies = timeStamp.Millisecond - intervalStart.Millisecond;
             long minutes = diffInMillies/1000/60;
 
             if (minutes <= 60)
@@ -59,12 +59,12 @@ public class TollCalculator
                vehicleType.Equals(TollFreeVehicles.Military.ToString());
     }
 
-    public int GetTimelyTollFee(DateTime date, Vehicle vehicle)
+    public int GetTimelyTollFee(DateTime timeStamp, Vehicle vehicle)
     {
-        if (IsTollFreeDate(date) || IsTollFreeVehicle(vehicle)) return 0;
+        if (IsTollFreeDate(timeStamp) || IsTollFreeVehicle(vehicle)) return 0;
 
-        int hour = date.Hour;
-        int minute = date.Minute;
+        int hour = timeStamp.Hour;
+        int minute = timeStamp.Minute;
 
         if (hour == 6 && minute <= 29) return 8;
         else if (hour == 6) return 13;
@@ -78,13 +78,13 @@ public class TollCalculator
         else return 0;
     }
 
-    private Boolean IsTollFreeDate(DateTime date)
+    private Boolean IsTollFreeDate(DateTime timeStamp)
     {
-        int year = date.Year;
-        int month = date.Month;
-        int day = date.Day;
+        int year = timeStamp.Year;
+        int month = timeStamp.Month;
+        int day = timeStamp.Day;
 
-        if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) return true;
+        if (timeStamp.DayOfWeek == DayOfWeek.Saturday || timeStamp.DayOfWeek == DayOfWeek.Sunday) return true;
 
         if (year == 2013)
         {
