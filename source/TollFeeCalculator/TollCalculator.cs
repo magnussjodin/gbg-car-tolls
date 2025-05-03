@@ -4,6 +4,13 @@ using TollFeeCalculator;
 
 public class TollCalculator
 {
+    /**
+     * Constants used in toll fee calculation
+     */
+    public const int MIN_TOLL_FEE = 0;
+    public const int MAX_DAILY_TOLL_FEE = 60;
+    public const int MAX_INTERVAL_MINUTES = 59;
+    
 
     /**
      * Calculate the total toll fee for one day
@@ -12,32 +19,31 @@ public class TollCalculator
      * @param timeStamps - date and time of all passes on one day
      * @return - the total toll fee for that day
      */
-
     public int GetDailyTollFee(Vehicle vehicle, DateTime[] timeStamps)
     {
-        if (timeStamps.Length == 0) return 0;
+        if (timeStamps.Length == 0) return MIN_TOLL_FEE;
         
         if (timeStamps.Any(timeStamp => timeStamp.Date != timeStamps[0].Date))
         {
             throw new ArgumentException("All time stamps must be from the same date.");
         }
 
-        var intervalStartTimeStamp = timeStamps.First().AddMinutes(-60); // Start value guaranteed to be before the first time stamp
-        var intervalMaxFee = 0;
-        var totalFee = 0;
+        var intervalStartTimeStamp = timeStamps.First().AddMinutes(-MAX_INTERVAL_MINUTES-1); // Start value guaranteed to be before the first time stamp
+        var intervalMaxFee = MIN_TOLL_FEE;
+        var totalFee = MIN_TOLL_FEE;
         foreach (DateTime timeStamp in timeStamps)
         {
             int fee = GetTimelyTollFee(timeStamp, vehicle);
 
             // TimeStamp is outside the 60 minute interval.
             // Add the max fee of the last interval to the total fee and start a new interval
-            if ((timeStamp - intervalStartTimeStamp).TotalMinutes >= 60)
+            if ((timeStamp - intervalStartTimeStamp).TotalMinutes > MAX_INTERVAL_MINUTES)
             {
                 totalFee += intervalMaxFee;
-                totalFee = Math.Min(totalFee, 60); // Cap the total fee to 60
+                totalFee = Math.Min(totalFee, MAX_DAILY_TOLL_FEE); // Cap the total fee to 60
 
                 // Max fee is reached, no need to calculate further
-                if (totalFee == 60)
+                if (totalFee == MAX_DAILY_TOLL_FEE)
                 {
                     return totalFee;
                 }
@@ -54,7 +60,7 @@ public class TollCalculator
         }
 
         totalFee += intervalMaxFee;
-        totalFee = Math.Min(totalFee, 60); // Cap the total fee to 60
+        totalFee = Math.Min(totalFee, MAX_DAILY_TOLL_FEE); // Cap the total fee to 60
 
         return totalFee;
     }
@@ -73,7 +79,7 @@ public class TollCalculator
 
     public int GetTimelyTollFee(DateTime timeStamp, Vehicle vehicle)
     {
-        if (IsTollFreeDate(timeStamp) || IsTollFreeVehicle(vehicle)) return 0;
+        if (IsTollFreeDate(timeStamp) || IsTollFreeVehicle(vehicle)) return MIN_TOLL_FEE;
 
         int hour = timeStamp.Hour;
         int minute = timeStamp.Minute;
@@ -87,7 +93,7 @@ public class TollCalculator
         else if (hour >= 15 && hour <= 16) return 18;
         else if (hour == 17) return 13;
         else if (hour == 18 && minute <= 29) return 8;
-        else return 0;
+        else return MIN_TOLL_FEE;
     }
 
     private Boolean IsTollFreeDate(DateTime timeStamp)
