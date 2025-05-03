@@ -8,15 +8,12 @@ public class TollCalculatorTests
     [Fact]
     public void GetTimelyTollFee_ShouldReturn0IfVehicleIsNull()
     {
-        // Arrange
         var tollCalculator = new TollCalculator();
         Vehicle vehicle = null;
         var timeStamp = GetTimeStampThatHasFee();
 
-        // Act
         var fee = tollCalculator.GetTimelyTollFee(timeStamp, vehicle);
 
-        // Assert
         Assert.Equal(0, fee);
     }
         
@@ -44,28 +41,23 @@ public class TollCalculatorTests
     
     [Theory]
     [MemberData(nameof(GetVehicleAndHasFeeTestData))]
-    public void GetTimelyTollFee_ShouldGiveFeeOnlyIfVehicleTypeHasFee(Vehicle vehicle, bool hasFee)
+    public void GetTimelyTollFee_ShouldReturnFeeOnlyIfVehicleTypeHasFee(Vehicle vehicle, bool hasFee)
     {
-        // Arrange
         var tollCalculator = new TollCalculator();
         var timeStamp = GetTimeStampThatHasFee();
 
-        // Act
         var fee = tollCalculator.GetTimelyTollFee(timeStamp, vehicle);
 
-        // Assert
         Assert.Equal(hasFee, fee > 0);
     }
     
     [Theory]
     [MemberData(nameof(GetTimelyTollFeeTestData))]
-    public void GetTimelyTollFee_ShouldGiveFeeAccordingToTimePeriod(DateTime startTimeStamp, DateTime endTimeStamp, int fee)
+    public void GetTimelyTollFee_ShouldReturnFeeAccordingToTimePeriodOfDay(DateTime startTimeStamp, DateTime endTimeStamp, int fee)
     {
-        // Arrange
         var tollCalculator = new TollCalculator();
         var vehicle = GetVehicleThatHasFee();
 
-        // Act & Assert
         // Check if the fee is valid for all minutes in the time period
         for (var timeStamp = startTimeStamp; timeStamp <= endTimeStamp; timeStamp = timeStamp.AddMinutes(1))
         {
