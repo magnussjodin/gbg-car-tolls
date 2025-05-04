@@ -104,18 +104,14 @@ namespace TollFeeCalculatorTests
         }
 
         [Fact]
-        public void RegisterPassage_ShouldSucceedToRegisterSameTimestampForSameLicenseNrButDifferentVehicleTypes()
+        public void RegisterPassage_ShouldFailToRegisterSameTimestampForSameLicenseNrButDifferentVehicleTypes()
         {
-            // Reason for that this should be allowed, even if the license number should be unique,
-            // is that there is no other way to detect that same license nr has been used for different vehicle types.
-            // Otherwise, first vehicle type will be registered and the second will be ignored.
-            // See the VehicleEqualityComparer.
             var passageTollHandler = new PassageTollHandler();
             string licenseNumber = "ABC 123";
             var vehicleType1 = GetValidVehicleType();
             var vehicleType2 = VehicleType.Motorbike;
             var timeStamp = DateTime.Now;
-            var expectedResult = true;
+            var expectedResult = false;
 
             passageTollHandler.RegisterPassage(licenseNumber, vehicleType1, timeStamp);
             var result = passageTollHandler.RegisterPassage(licenseNumber, vehicleType2, timeStamp);

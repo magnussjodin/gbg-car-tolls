@@ -12,11 +12,11 @@ namespace TollFeeCalculator
         public const string UNSUPPORTED_VEHICLETYPE_EXCEPTION_MESSAGE = "Unsupported vehicle type.";
 
         // Dictionary to store vehicle passage registrations
-        private readonly Dictionary<Vehicle, List<DateTime>> _vehiclePassageRegistry;
+        private readonly Dictionary<string, List<VehiclePassage>> _vehiclePassageRegistry;
 
         public PassageTollHandler()
         {
-            _vehiclePassageRegistry = new Dictionary<Vehicle, List<DateTime>>(new VehicleEqualityComparer());
+            _vehiclePassageRegistry = new Dictionary<string, List<VehiclePassage>>();
         }
 
         // Method to register a vehicle passage
@@ -27,26 +27,31 @@ namespace TollFeeCalculator
                 return false; // The license number is invalid
             }
             
-            var vehicle = CreateVehicle(licenseNumber, vehicleType);
+            var passage = new VehiclePassage()
+            { 
+                Vehicle = CreateVehicle(licenseNumber, vehicleType),
+                TimeStamp = timeStamp
+            };
             
-            return RegisterPassage(vehicle, timeStamp);
+            return RegisterPassage(passage);
         }
 
-        private bool RegisterPassage(Vehicle vehicle, DateTime timeStamp)
+        private bool RegisterPassage(VehiclePassage passage)
         {
-            if (!_vehiclePassageRegistry.ContainsKey(vehicle))
+            var licenseNumber = passage.Vehicle.LicenseNumber;
+            if (!_vehiclePassageRegistry.ContainsKey(licenseNumber))
             {
-                _vehiclePassageRegistry[vehicle] = new List<DateTime>();
+                _vehiclePassageRegistry[licenseNumber] = new List<VehiclePassage>();
             }
 
             // Only add the timestamp if it is not already present
             // This prevents duplicate entries for the same vehicle and timestamp
-            if (_vehiclePassageRegistry[vehicle].Contains(timeStamp))
+            if (_vehiclePassageRegistry[licenseNumber].Exists(x => x.TimeStamp == passage.TimeStamp))
             {
                 return false; // Passage already registered
             }
 
-            _vehiclePassageRegistry[vehicle].Add(timeStamp);
+            _vehiclePassageRegistry[licenseNumber].Add(passage);
             return true; // Passage successfully registered
         }
 
