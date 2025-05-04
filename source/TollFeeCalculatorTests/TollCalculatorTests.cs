@@ -347,8 +347,8 @@ public class TollCalculatorTests
 
     public static IEnumerable<object[]> GetVehicleAndHasFeeTestData()
     {
-        yield return new object[] { new Car(), true };
-        yield return new object[] { new Motorbike(), false };
+        yield return new object[] { new Car() { LicenseNumber = string.Empty }, true };
+        yield return new object[] { new Motorbike() { LicenseNumber = string.Empty }, false };
     }
 
     public static IEnumerable<object[]> GetTimelyTollFeeTestData()

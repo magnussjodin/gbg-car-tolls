@@ -9,5 +9,6 @@ namespace TollFeeCalculator
     public class Motorbike : Vehicle
     {
         public VehicleType VehicleType => VehicleType.Motorbike;
+        public required string LicenseNumber { get; set; }
     }
 }
