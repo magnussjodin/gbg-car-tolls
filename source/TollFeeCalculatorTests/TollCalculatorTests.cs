@@ -8,6 +8,66 @@ public class TollCalculatorTests
     private const int INVALID_TOLL_FEE = -1;
 
     [Fact]
+    public void GetListOfDailyTollFees_ShouldReturnFeesInAnOrderedListOfDates()
+    {
+        var tollCalculator = new TollCalculator();
+        var vehicleType = GetVehicleTypeThatHasFee();
+        var timeStamps = new DateTime[]
+        {
+            new DateTime(2013, 1, 2, 0, 0, 0),
+            new DateTime(2013, 1, 3, 0, 0, 0),
+            new DateTime(2013, 1, 1, 0, 0, 0),
+        };
+        var expectedDailyFees = new List<DailyFee>
+        {
+            new DailyFee { Date = new DateTime(2013, 1, 1), Fee = TollCalculator.MIN_TOLL_FEE },
+            new DailyFee { Date = new DateTime(2013, 1, 2), Fee = TollCalculator.MIN_TOLL_FEE },
+            new DailyFee { Date = new DateTime(2013, 1, 3), Fee = TollCalculator.MIN_TOLL_FEE },
+        };
+
+        var dailyFees = tollCalculator.GetListOfDailyTollFees(vehicleType, timeStamps);
+        
+        for (var i = 0; i < dailyFees.Count; i++)
+        {
+            Assert.Equal(dailyFees[i].Date, expectedDailyFees[i].Date);
+        }
+    }
+        
+    [Fact]
+    public void GetListOfDailyTollFees_ShouldAddFeesFromDifferentDatesToThoseDates()
+    {
+        var tollCalculator = new TollCalculator();
+        var vehicleType = GetVehicleTypeThatHasFee();
+        var timeStamps = new DateTime[]
+        {
+            new DateTime(2013, 1, 3, 6, 30, 0), // 2013-01-03 => 13
+
+            new DateTime(2013, 1, 2, 14, 45, 0), // 2013-01-02 => 8
+            new DateTime(2013, 1, 2, 6, 0, 0), // 2013-01-02 => 8
+
+            new DateTime(2013, 1, 3, 8, 0, 0), // 2013-01-03 => 13
+            new DateTime(2013, 1, 1, 10, 0, 0), // 2013-01-01 => 0
+
+            new DateTime(2013, 1, 2, 16, 45, 0), // 2013-01-02 => 18
+            new DateTime(2013, 1, 2, 0, 0, 0), // 2013-01-02 => 0
+        };
+        var expectedDailyFees = new List<DailyFee>
+        {
+            new DailyFee { Date = new DateTime(2013, 1, 1), Fee = TollCalculator.MIN_TOLL_FEE }, // 0
+            new DailyFee { Date = new DateTime(2013, 1, 2), Fee = 2 * TollCalculator.LEVEL_1_TOLL_FEE + TollCalculator.LEVEL_3_TOLL_FEE }, // 8 + 8 + 18
+            new DailyFee { Date = new DateTime(2013, 1, 3), Fee = 2 * TollCalculator.LEVEL_2_TOLL_FEE }, // 13 + 13
+        };
+
+        var dailyFees = tollCalculator.GetListOfDailyTollFees(vehicleType, timeStamps);
+        
+        for (var i = 0; i < dailyFees.Count; i++)
+        {
+            Assert.Equal(dailyFees[i].Date, expectedDailyFees[i].Date);
+            Assert.Equal(dailyFees[i].Fee, expectedDailyFees[i].Fee);
+        }
+    }
+        
+    [Fact]
     public void GetDailyTollFee_ShouldReturn0ForAnEmptyTimeStampArray()
     {
         var tollCalculator = new TollCalculator();

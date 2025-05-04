@@ -26,6 +26,22 @@ public class TollCalculator
     ];
 
     /**
+     * Calculate the daily toll fee for any list of timestamps
+     *
+     * @param vehicleType - the vehicle type
+     * @param timeStamps - timestamps for any days
+     * @return - a list of DailyFee objects for each day
+     */
+    public IList<DailyFee> GetListOfDailyTollFees(VehicleType vehicleType, IList<DateTime> timeStamps)
+    {
+        return timeStamps
+            .GroupBy(timeStamp => timeStamp.Date) // Group by date
+            .Select(group => new DailyFee { Date = group.Key, Fee = GetDailyTollFee(vehicleType, group.ToArray()) } )
+            .OrderBy(dailyFee => dailyFee.Date) // Sort by date
+            .ToList();
+    }
+
+    /**
      * Calculate the total toll fee for one day
      *
      * @param vehicleType - the vehicle type
