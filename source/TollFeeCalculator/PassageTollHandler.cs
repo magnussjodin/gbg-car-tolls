@@ -19,14 +19,25 @@ namespace TollFeeCalculator
             _vehiclePassageRegistry = new Dictionary<string, List<VehiclePassage>>();
         }
 
+        // Method to add a list of vehicle passages to the registred passages
+        public int RegisterListOfPassages(IEnumerable<VehiclePassage> passages)
+        {
+            int numberOfAddedPassages = 0;
+
+            foreach (var passage in passages)
+            {
+                if (RegisterPassage(passage))
+                {
+                    numberOfAddedPassages++;
+                }
+            }
+
+            return numberOfAddedPassages;            
+        }
+
         // Method to register a vehicle passage
         public bool RegisterPassage(string licenseNumber, VehicleType vehicleType, DateTime timeStamp)
         {
-            if (string.IsNullOrEmpty(licenseNumber))
-            {
-                return false; // The license number is invalid
-            }
-            
             var passage = new VehiclePassage()
             { 
                 Vehicle = CreateVehicle(licenseNumber, vehicleType),
@@ -39,12 +50,20 @@ namespace TollFeeCalculator
         private bool RegisterPassage(VehiclePassage passage)
         {
             var licenseNumber = passage.Vehicle.LicenseNumber;
+            
+            // Check if the license number is invalid
+            if (string.IsNullOrEmpty(licenseNumber))
+            {
+                return false;
+            }
+            
+            // Check if the passage already has a registration
             if (!_vehiclePassageRegistry.ContainsKey(licenseNumber))
             {
                 _vehiclePassageRegistry[licenseNumber] = new List<VehiclePassage>();
             }
 
-            // Only add the timestamp if it is not already present
+            // Only add the passage if it is not already present
             // This prevents duplicate entries for the same vehicle and timestamp
             if (_vehiclePassageRegistry[licenseNumber].Exists(x => x.TimeStamp == passage.TimeStamp))
             {

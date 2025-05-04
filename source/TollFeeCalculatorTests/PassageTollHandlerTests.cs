@@ -7,6 +7,37 @@ namespace TollFeeCalculatorTests
     public class PassageTollHandlerTests
     {
         [Fact]
+        public void RegisterListOfPassages_ShouldReturnZeroIfNoPassagesAreAdded()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            var passages = new List<VehiclePassage>();
+            var expectedResult = 0;
+
+            var result = passageTollHandler.RegisterListOfPassages(passages);
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public void RegisterListOfPassages_ShouldReturnNumberOfSuccessfullyAddedPassages()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            var timeStamp = DateTime.Now;
+            var passages = new List<VehiclePassage>()
+            {
+                new VehiclePassage { Vehicle = new Car { LicenseNumber = "ABC 123" }, TimeStamp = timeStamp },
+                new VehiclePassage { Vehicle = new Car { LicenseNumber = "DEF 456" }, TimeStamp = timeStamp.AddMinutes(1) },
+                new VehiclePassage { Vehicle = new Car { LicenseNumber = string.Empty}, TimeStamp = timeStamp.AddMinutes(2) }, // Invalid license number
+                new VehiclePassage { Vehicle = new Car { LicenseNumber = "ABC 123" }, TimeStamp = timeStamp } // Duplicate timestamp
+            };
+            var expectedResult = 2; // Only two passages should be added successfully
+
+            var result = passageTollHandler.RegisterListOfPassages(passages);
+
+            Assert.Equal(expectedResult, result);
+        }
+        
+        [Fact]
         public void RegisterPassage_ShouldFailIfLicenseNumberIsEmpty()
         {
             var passageTollHandler = new PassageTollHandler();
