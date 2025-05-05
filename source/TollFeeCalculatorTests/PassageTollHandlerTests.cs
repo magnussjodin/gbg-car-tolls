@@ -183,7 +183,7 @@ namespace TollFeeCalculatorTests
         }
 
         [Fact]
-        public void GetListOfPassages_ForSpecificLicenseNr_ShouldRaiseExceptionForEmptyLicenseNr()
+        public void GetListOfPassages_SpecificLicenseNr_ShouldRaiseExceptionForEmptyLicenseNr()
         {
             var passageTollHandler = new PassageTollHandler();
             passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
@@ -206,7 +206,7 @@ namespace TollFeeCalculatorTests
         }
 
         [Fact]
-        public void GetListOfPassages_ForSpecificLicenseNr_ShouldRaiseExceptionWhenFromDateLaterThanToDate()
+        public void GetListOfPassages_SpecificLicenseNr_ShouldRaiseExceptionWhenFromDateLaterThanToDate()
         {
             var passageTollHandler = new PassageTollHandler();
             passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
@@ -230,7 +230,7 @@ namespace TollFeeCalculatorTests
         }
 
         [Fact]
-        public void GetListOfPassages_ForSpecificLicenseNr_ShouldReturnEmptyListForNonExistingLicenseNr()
+        public void GetListOfPassages_SpecificLicenseNr_ShouldReturnEmptyListForNonExistingLicenseNr()
         {
             var passageTollHandler = new PassageTollHandler();
             passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
@@ -252,7 +252,7 @@ namespace TollFeeCalculatorTests
         }
 
         [Fact]
-        public void GetListOfPassages_ForSpecificLicenseNr_ShouldReturnListOnlyWithDatesInTimeStampInterval()
+        public void GetListOfPassages_SpecificLicenseNr_ShouldReturnPassagesOnlyWithDatesInTimeStampInterval()
         {
             var passageTollHandler = new PassageTollHandler();
             var passageList = GetVehiclePassageTestData();
@@ -280,7 +280,30 @@ namespace TollFeeCalculatorTests
         }
 
         [Fact]
-        public void GetListOfPassages_All_ShouldReturnListForAnyVehicleWithDatesInTimeStampInterval()
+        public void GetListOfPassages_All_ShouldRaiseExceptionWhenFromDateLaterThanToDate()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
+
+            var fromTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 2, 0, 0, 0);
+            IOrderedEnumerable<VehiclePassage>? list = null;
+
+            try
+            {
+                list = passageTollHandler.GetListOfPassages(fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception ex)
+            {
+                Assert.IsType<ArgumentException>(ex);
+                Assert.Equal(PassageTollHandler.TIMESTAMPS_IN_WRONG_ORDER_EXCEPTION_MESSAGE, ex.Message);
+            }
+
+            Assert.True(list is null || list.Count() == 0);
+        }
+
+        [Fact]
+        public void GetListOfPassages_All_ShouldReturnPassagesForAnyVehicleWithDatesInTimeStampInterval()
         {
             var passageTollHandler = new PassageTollHandler();
             var passageList = GetVehiclePassageTestData();
