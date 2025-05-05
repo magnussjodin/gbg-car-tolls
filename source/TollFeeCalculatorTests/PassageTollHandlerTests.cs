@@ -150,6 +150,143 @@ namespace TollFeeCalculatorTests
             Assert.Equal(expectedResult, result);
         }
 
+        [Fact]
+        public void GetListOfPassages_ForSpecificLicenseNr_ShouldRaiseExceptionForNullOrEmptyLicenseNr()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
+
+            string? licenseNumber = null;
+            var fromTimeStamp = new DateTime(2013, 1, 2, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            IOrderedEnumerable<VehiclePassage>? list = null;
+
+            try
+            {
+                list = passageTollHandler.GetListOfPassages(licenseNumber, fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception ex)
+            {
+                Assert.IsType<ArgumentException>(ex);
+                Assert.Equal(PassageTollHandler.INVALID_LICENSE_NUMBER_EXCEPTION_MESSAGE, ex.Message);
+            }
+            Assert.True(list is null || list.Count() == 0);
+
+            licenseNumber = string.Empty;
+            list = null;
+            try
+            {
+                list = passageTollHandler.GetListOfPassages(licenseNumber, fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception ex)
+            {
+                Assert.IsType<ArgumentException>(ex);
+                Assert.Equal(PassageTollHandler.INVALID_LICENSE_NUMBER_EXCEPTION_MESSAGE, ex.Message);
+            }
+            Assert.True(list is null || list.Count() == 0);
+        }
+
+        [Fact]
+        public void GetListOfPassages_ForSpecificLicenseNr_ShouldRaiseExceptionWhenFromDateLaterThanToDate()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
+
+            string licenseNumber = "ABC 123";
+            var fromTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 2, 0, 0, 0);
+            IOrderedEnumerable<VehiclePassage>? list = null;
+
+            try
+            {
+                list = passageTollHandler.GetListOfPassages(licenseNumber, fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception ex)
+            {
+                Assert.IsType<ArgumentException>(ex);
+                Assert.Equal(PassageTollHandler.TIMESTAMPS_IN_WRONG_ORDER_EXCEPTION_MESSAGE, ex.Message);
+            }
+
+            Assert.True(list is null || list.Count() == 0);
+        }
+
+        [Fact]
+        public void GetListOfPassages_ForSpecificLicenseNr_ShouldReturnEmptyListForNonExistingLicenseNr()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
+
+            string licenseNumber = "ABC 789";
+            var fromTimeStamp = new DateTime(2013, 1, 2, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            IOrderedEnumerable<VehiclePassage>? list = null;
+
+            try
+            {
+                list = passageTollHandler.GetListOfPassages(licenseNumber, fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception)
+            {
+            }
+
+            Assert.True(list is null || list.Count() == 0);
+        }
+
+        [Fact]
+        public void GetListOfPassages_ForSpecificLicenseNr_ShouldReturnListOnlyWithDatesInTimeStampInterval()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            var passageList = GetVehiclePassageTestData();
+            passageTollHandler.RegisterListOfPassages(passageList);
+
+            string licenseNumber = "ABC 123";
+            var fromTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 4, 0, 0, 0);
+            IOrderedEnumerable<VehiclePassage>? list = null;
+
+            var expectedCount = passageList
+                .Where(x => x.Vehicle.LicenseNumber == licenseNumber && x.TimeStamp >= fromTimeStamp && x.TimeStamp <= toTimeStamp)
+                .Count();
+
+            try
+            {
+                list = passageTollHandler.GetListOfPassages(licenseNumber, fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception)
+            {
+            }
+
+            Assert.True(list is not null);
+            Assert.Equal(expectedCount, list.Count());
+        }
+
+        [Fact]
+        public void GetListOfPassages_All_ShouldReturnListForAnyVehicleWithDatesInTimeStampInterval()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            var passageList = GetVehiclePassageTestData();
+            passageTollHandler.RegisterListOfPassages(passageList);
+
+            var fromTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 4, 0, 0, 0);
+            IOrderedEnumerable<VehiclePassage>? list = null;
+
+            var expectedCount = passageList
+                .Where(x => x.TimeStamp >= fromTimeStamp && x.TimeStamp <= toTimeStamp)
+                .Count();
+
+            try
+            {
+                list = passageTollHandler.GetListOfPassages(fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception)
+            {
+            }
+
+            Assert.True(list is not null);
+            Assert.Equal(expectedCount, list.Count());
+        }
+
         private VehicleType GetInvalidVehicleType()
         {
             return VehicleType.Tractor;
@@ -158,6 +295,67 @@ namespace TollFeeCalculatorTests
         private VehicleType GetValidVehicleType()
         {
             return VehicleType.Car;
+        }
+
+        private static IEnumerable<VehiclePassage> GetVehiclePassageTestData()
+        {
+            var car1 = new Car() { LicenseNumber = "ABC 123" };
+            var car2 = new Car() { LicenseNumber = "DEF 456" };
+            var car3 = new Car() { LicenseNumber = "GHI 789" };
+            var motorBike1 = new Motorbike() { LicenseNumber = "MC 1000" };
+
+            var timeStampsThatGivesDailyMax = new List<DateTime>
+            {
+                new DateTime(2013, 1, 2, 6, 29, 0), // 8
+                new DateTime(2013, 1, 2, 7, 0, 0), // 18, the maximum fee in 1st time period
+                new DateTime(2013, 1, 2, 7, 59, 0), // 18, the maximum fee in 2nd time period
+                new DateTime(2013, 1, 2, 8, 30, 0), // 8
+                new DateTime(2013, 1, 2, 14, 44, 0), // 8, the maximum fee in 3rd time period
+                new DateTime(2013, 1, 2, 16, 59, 0), // 18, the maximum fee in 4th time period
+            };
+
+            var timeStampsThatGivesALowerDailyThanMax = new List<DateTime>
+            {
+                new DateTime(2013, 1, 3, 6, 29, 0), // 8
+                new DateTime(2013, 1, 3, 7, 0, 0), // 18, the maximum fee in 1st time period
+                new DateTime(2013, 1, 3, 7, 59, 0), // 18, the maximum fee in 2nd time period
+                new DateTime(2013, 1, 3, 8, 30, 0), // 8
+            };
+
+            var timeStampsThatAreTollFree = new List<DateTime>
+            {
+                new DateTime(2013, 1, 4, 0, 0, 0), // Before fee period
+                new DateTime(2013, 1, 4, 5, 29, 0), // Before fee period
+                new DateTime(2013, 1, 4, 21, 29, 0), // After fee period
+                new DateTime(2013, 1, 7, 10, 0, 0), // Saturday
+                new DateTime(2013, 1, 8, 10, 0, 0), // Sunday
+                new DateTime(2013, 7, 3, 7, 59, 0), // July
+                new DateTime(2013, 7, 31, 7, 59, 0), // July
+            };
+
+            foreach (var timeStamp in timeStampsThatGivesDailyMax)
+            {
+                yield return new VehiclePassage { Vehicle = car1, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car2, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car3, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = motorBike1, TimeStamp = timeStamp };
+            };
+
+            foreach (var timeStamp in timeStampsThatGivesALowerDailyThanMax)
+            {
+                yield return new VehiclePassage { Vehicle = car1, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car2, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car3, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = motorBike1, TimeStamp = timeStamp };
+            };
+
+            foreach (var timeStamp in timeStampsThatAreTollFree)
+            {
+                yield return new VehiclePassage { Vehicle = car1, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car2, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car3, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = motorBike1, TimeStamp = timeStamp };
+            };
         }
     }
 }
