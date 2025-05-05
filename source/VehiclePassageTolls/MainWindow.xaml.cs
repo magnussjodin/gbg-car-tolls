@@ -23,6 +23,9 @@ namespace VehiclePassageTolls
         {
             InitializeComponent();
             _passageTollHandler = new PassageTollHandler();
+
+            // Load initial passages
+            _passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
         }
 
         private void RegisterPassage_Click(object sender, RoutedEventArgs e)
@@ -37,7 +40,7 @@ namespace VehiclePassageTolls
                 var timestamp = date.Add(time);
 
                 _passageTollHandler.RegisterPassage(licenseNumber, vehicleType, timestamp);
-                Filter_Click(sender, e);
+                Filter_Click(sender, e); // Refresh the data grids after registering a passage
             }
             catch (Exception ex)
             {
@@ -73,6 +76,72 @@ namespace VehiclePassageTolls
             {
                 MessageBox.Show($"Error: {ex.Message}");
             }
+        }
+        
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Filter_Click(sender, e); // Initially update the data grids with all passages and daily fees
+        }
+
+        private static IEnumerable<VehiclePassage> GetVehiclePassageTestData()
+        {
+            var car1 = new Car() { LicenseNumber = "ABC 123" };
+            var car2 = new Car() { LicenseNumber = "DEF 456" };
+            var car3 = new Car() { LicenseNumber = "GHI 789" };
+            var motorBike1 = new Motorbike() { LicenseNumber = "MC 1000" };
+
+            var timeStampsThatGivesDailyMax = new List<DateTime>
+            {
+                new DateTime(2013, 1, 2, 6, 29, 0), // 8
+                new DateTime(2013, 1, 2, 7, 0, 0), // 18, the maximum fee in 1st time period
+                new DateTime(2013, 1, 2, 7, 59, 0), // 18, the maximum fee in 2nd time period
+                new DateTime(2013, 1, 2, 8, 30, 0), // 8
+                new DateTime(2013, 1, 2, 14, 44, 0), // 8, the maximum fee in 3rd time period
+                new DateTime(2013, 1, 2, 16, 59, 0), // 18, the maximum fee in 4th time period
+            };
+
+            var timeStampsThatGivesALowerDailyThanMax = new List<DateTime>
+            {
+                new DateTime(2013, 1, 3, 6, 29, 0), // 8
+                new DateTime(2013, 1, 3, 7, 0, 0), // 18, the maximum fee in 1st time period
+                new DateTime(2013, 1, 3, 7, 59, 0), // 18, the maximum fee in 2nd time period
+                new DateTime(2013, 1, 3, 8, 30, 0), // 8
+            };
+
+            var timeStampsThatAreTollFree = new List<DateTime>
+            {
+                new DateTime(2013, 1, 4, 0, 0, 0), // Before fee period
+                new DateTime(2013, 1, 4, 5, 29, 0), // Before fee period
+                new DateTime(2013, 1, 4, 21, 29, 0), // After fee period
+                new DateTime(2013, 1, 7, 10, 0, 0), // Saturday
+                new DateTime(2013, 1, 8, 10, 0, 0), // Sunday
+                new DateTime(2013, 7, 3, 7, 59, 0), // July
+                new DateTime(2013, 7, 31, 7, 59, 0), // July
+            };
+
+            foreach (var timeStamp in timeStampsThatGivesDailyMax)
+            {
+                yield return new VehiclePassage { Vehicle = car1, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car2, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car3, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = motorBike1, TimeStamp = timeStamp };
+            };
+
+            foreach (var timeStamp in timeStampsThatGivesALowerDailyThanMax)
+            {
+                yield return new VehiclePassage { Vehicle = car1, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car2, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car3, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = motorBike1, TimeStamp = timeStamp };
+            };
+
+            foreach (var timeStamp in timeStampsThatAreTollFree)
+            {
+                yield return new VehiclePassage { Vehicle = car1, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car2, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = car3, TimeStamp = timeStamp };
+                yield return new VehiclePassage { Vehicle = motorBike1, TimeStamp = timeStamp };
+            };
         }
     }
 }

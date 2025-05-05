@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TollFeeCalculator", "TollFe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TollFeeCalculatorTests", "TollFeeCalculatorTests\TollFeeCalculatorTests.csproj", "{FDBA8C14-06FB-4703-849D-487DA5B91559}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehiclePassageTolls", "VehiclePassageTolls\VehiclePassageTolls.csproj", "{98F706C9-8058-4A83-8572-DC0F5707F585}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,18 @@ Global
 		{FDBA8C14-06FB-4703-849D-487DA5B91559}.Release|x64.Build.0 = Release|Any CPU
 		{FDBA8C14-06FB-4703-849D-487DA5B91559}.Release|x86.ActiveCfg = Release|Any CPU
 		{FDBA8C14-06FB-4703-849D-487DA5B91559}.Release|x86.Build.0 = Release|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Debug|x64.Build.0 = Debug|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Debug|x86.Build.0 = Debug|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Release|x64.ActiveCfg = Release|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Release|x64.Build.0 = Release|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Release|x86.ActiveCfg = Release|Any CPU
+		{98F706C9-8058-4A83-8572-DC0F5707F585}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

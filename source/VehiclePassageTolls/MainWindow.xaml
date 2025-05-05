@@ -2,8 +2,9 @@
 <Window x:Class="VehiclePassageTolls.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Vehicle Passage Tolls" Height="1000" Width="1000"
-        WindowStartupLocation="CenterScreen">
+        Title="Vehicle Passage Tolls" Height="800" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -62,13 +63,13 @@
             <!-- Passages DataGrid -->
             <StackPanel Grid.Column="0" Margin="5">
                 <TextBlock Text="Passages" FontWeight="Bold" Margin="0,0,0,5" />
-                <DataGrid x:Name="PassagesDataGrid" AutoGenerateColumns="True" Margin="0,10,0,0" />
+                <DataGrid x:Name="PassagesDataGrid" AutoGenerateColumns="True" Margin="0,10,0,0" MaxHeight="450" />
             </StackPanel>
 
             <!-- Daily Fees DataGrid -->
             <StackPanel Grid.Column="1" Margin="5">
                 <TextBlock Text="Daily Fees" FontWeight="Bold" Margin="0,0,0,5" />
-                <DataGrid x:Name="DailyFeesDataGrid" AutoGenerateColumns="True" Margin="0,10,0,0" />
+                <DataGrid x:Name="DailyFeesDataGrid" AutoGenerateColumns="True" Margin="0,10,0,0" MaxHeight="450" />
             </StackPanel>
         </Grid>
     </Grid>

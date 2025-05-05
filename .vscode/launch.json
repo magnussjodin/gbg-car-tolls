@@ -13,17 +13,21 @@
             "type": "coreclr",
             "request": "launch",
             "name": "Launch TollFeeCalculatorTests",
-            "program": "${workspaceFolder}/source/TollFeeCalculatorTests/bin/Debug/net9.0/${input:testAssembly}.dll",
+            "program": "${workspaceFolder}/source/TollFeeCalculatorTests/bin/Debug/net9.0/TollFeeCalculatorTests.dll",
             "preLaunchTask": "build TollFeeCalculatorTests",
             "cwd": "${workspaceFolder}/source/TollFeeCalculatorTests",
             "stopAtEntry": false
-        }
-    ],
-    "inputs": [
+        },
         {
-            "type": "promptString",
-            "id": "testAssembly",
-            "description": "Enter the name of the test assembly to debug (e.g., TollFeeCalculatorTests)"
-        }
-    ]
+            "name": "Debug VehiclePassageTolls",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/source/VehiclePassageTolls/bin/Debug/net9.0-windows/VehiclePassageTolls.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/source/VehiclePassageTolls",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+          }
+   ]
 }

@@ -20,6 +20,16 @@
 				"${workspaceFolder}/source/TollFeeCalculatorTests/TollFeeCalculatorTests.csproj"
 			],
 			"problemMatcher": "$msCompile"
-		}
-	]
+		},
+		{
+			"label": "build",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+			  "build",
+			  "${workspaceFolder}/source/VehiclePassageTolls/VehiclePassageTolls.csproj"
+			],
+			"problemMatcher": "$msCompile"
+		  }
+  ]
 }
