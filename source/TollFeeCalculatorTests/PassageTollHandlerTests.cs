@@ -163,7 +163,8 @@ namespace TollFeeCalculatorTests
             Assert.True(result);
 
             var passageList = passageTollHandler.GetListOfPassages(licenseNumber, expectedTimeStamp, expectedTimeStamp.AddMinutes(1));
-            Assert.True(passageList is not null && passageList.Any());
+            Assert.NotNull(passageList);
+            Assert.NotEmpty(passageList);
             Assert.Equal(passageList.FirstOrDefault()?.TimeStamp, expectedTimeStamp);
         }
 
@@ -248,7 +249,8 @@ namespace TollFeeCalculatorTests
             {
             }
 
-            Assert.True(list is null || list.Count() == 0);
+            Assert.NotNull(list);
+            Assert.Empty(list);
         }
 
         [Fact]
@@ -275,7 +277,7 @@ namespace TollFeeCalculatorTests
             {
             }
 
-            Assert.True(list is not null);
+            Assert.NotNull(list);
             Assert.Equal(expectedCount, list.Count());
         }
 
@@ -325,7 +327,7 @@ namespace TollFeeCalculatorTests
             {
             }
 
-            Assert.True(list is not null);
+            Assert.NotNull(list);
             Assert.Equal(expectedCount, list.Count());
         }
 
@@ -396,7 +398,8 @@ namespace TollFeeCalculatorTests
             {
             }
 
-            Assert.True(list is null || list.Count() == 0);
+            Assert.NotNull(list);
+            Assert.Empty(list);
         }
 
         [Fact]
@@ -425,7 +428,7 @@ namespace TollFeeCalculatorTests
             {
             }
 
-            Assert.True(list is not null);
+            Assert.NotNull(list);
             Assert.Equal(expectedCount, list.Count());
         }
 
@@ -477,7 +480,7 @@ namespace TollFeeCalculatorTests
             {
             }
 
-            Assert.True(list is not null);
+            Assert.NotNull(list);
             Assert.Equal(expectedCount, list.Count());
         }
 

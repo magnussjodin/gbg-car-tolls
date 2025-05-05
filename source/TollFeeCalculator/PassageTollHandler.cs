@@ -163,7 +163,7 @@ namespace TollFeeCalculator
             // If no passage exists for the given license number, return an empty list
             if (!_vehiclePassageRegistry.TryGetValue(licenseNumber, out var passages))
             {
-                return (IOrderedEnumerable<VehiclePassage>)new List<VehiclePassage>(); 
+                return new List<VehiclePassage>().OrderBy(x => x.TimeStamp);
             }
 
             return passages
@@ -179,7 +179,7 @@ namespace TollFeeCalculator
             // If no passage exists for the license number, return an empty list
             if (!passages.Any())
             {
-                return (IOrderedEnumerable<DailyFee>)new List<DailyFee>(); 
+                return new List<DailyFee>().OrderBy(x => x.Date); 
             }
 
             // Get the vehicle type from the first passage
