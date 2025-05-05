@@ -329,6 +329,158 @@ namespace TollFeeCalculatorTests
             Assert.Equal(expectedCount, list.Count());
         }
 
+
+        [Fact]
+        public void GetListOfDailyFees_SpecificLicenseNr_ShouldRaiseExceptionForEmptyLicenseNr()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
+
+            string? licenseNumber = string.Empty;
+            var fromTimeStamp = new DateTime(2013, 1, 2, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            IOrderedEnumerable<DailyFee>? list = null;
+
+            try
+            {
+                list = passageTollHandler.GetListOfDailyFees(licenseNumber, fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception ex)
+            {
+                Assert.IsType<ArgumentException>(ex);
+                Assert.Equal(PassageTollHandler.INVALID_LICENSE_NUMBER_EXCEPTION_MESSAGE, ex.Message);
+            }
+            Assert.True(list is null || list.Count() == 0);
+        }
+
+        [Fact]
+        public void GetListOfDailyFees_SpecificLicenseNr_ShouldRaiseExceptionWhenFromDateLaterThanToDate()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
+
+            string licenseNumber = "ABC 123";
+            var fromTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 2, 0, 0, 0);
+            IOrderedEnumerable<DailyFee>? list = null;
+
+            try
+            {
+                list = passageTollHandler.GetListOfDailyFees(licenseNumber, fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception ex)
+            {
+                Assert.IsType<ArgumentException>(ex);
+                Assert.Equal(PassageTollHandler.TIMESTAMPS_IN_WRONG_ORDER_EXCEPTION_MESSAGE, ex.Message);
+            }
+
+            Assert.True(list is null || list.Count() == 0);
+        }
+
+        [Fact]
+        public void GetListOfDailyFees_SpecificLicenseNr_ShouldReturnEmptyListForNonExistingLicenseNr()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
+
+            string licenseNumber = "ABC 789";
+            var fromTimeStamp = new DateTime(2013, 1, 2, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            IOrderedEnumerable<DailyFee>? list = null;
+
+            try
+            {
+                list = passageTollHandler.GetListOfDailyFees(licenseNumber, fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception)
+            {
+            }
+
+            Assert.True(list is null || list.Count() == 0);
+        }
+
+        [Fact]
+        public void GetListOfDailyFees_SpecificLicenseNr_ShouldReturnDailyFeesOnlyWithDatesInTimeStampInterval()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            var passageList = GetVehiclePassageTestData();
+            passageTollHandler.RegisterListOfPassages(passageList);
+
+            string licenseNumber = "ABC 123";
+            var fromTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 4, 0, 0, 0);
+            IOrderedEnumerable<DailyFee>? list = null;
+
+            var expectedCount = passageList
+                .Where(x => x.Vehicle.LicenseNumber == licenseNumber && x.TimeStamp >= fromTimeStamp && x.TimeStamp <= toTimeStamp)
+                .Select(x => x.TimeStamp.Date)
+                .Distinct()
+                .Count();
+
+            try
+            {
+                list = passageTollHandler.GetListOfDailyFees(licenseNumber, fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception)
+            {
+            }
+
+            Assert.True(list is not null);
+            Assert.Equal(expectedCount, list.Count());
+        }
+
+        [Fact]
+        public void GetListOfDailyFees_All_ShouldRaiseExceptionWhenFromDateLaterThanToDate()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
+
+            var fromTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 2, 0, 0, 0);
+            IOrderedEnumerable<DailyFee>? list = null;
+
+            try
+            {
+                list = passageTollHandler.GetListOfDailyFees(fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception ex)
+            {
+                Assert.IsType<ArgumentException>(ex);
+                Assert.Equal(PassageTollHandler.TIMESTAMPS_IN_WRONG_ORDER_EXCEPTION_MESSAGE, ex.Message);
+            }
+
+            Assert.True(list is null || list.Count() == 0);
+        }
+
+        [Fact]
+        public void GetListOfDailyFees_All_ShouldReturnDailyFeesForAnyVehicleWithDatesInTimeStampInterval()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            var passageList = GetVehiclePassageTestData();
+            passageTollHandler.RegisterListOfPassages(passageList);
+
+            var fromTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
+            var toTimeStamp = new DateTime(2013, 1, 4, 0, 0, 0);
+            IOrderedEnumerable<DailyFee>? list = null;
+
+            var expectedCount = passageList
+                .Where(x => x.TimeStamp >= fromTimeStamp && x.TimeStamp <= toTimeStamp)
+                .Select(x => ( x.Vehicle?.LicenseNumber, x.TimeStamp.Date ))
+                .Distinct()
+                .Count();
+
+            try
+            {
+                list = passageTollHandler.GetListOfDailyFees(fromTimeStamp, toTimeStamp);
+            }
+            catch (System.Exception)
+            {
+            }
+
+            Assert.True(list is not null);
+            Assert.Equal(expectedCount, list.Count());
+        }
+
         private VehicleType GetInvalidVehicleType()
         {
             return VehicleType.Tractor;
