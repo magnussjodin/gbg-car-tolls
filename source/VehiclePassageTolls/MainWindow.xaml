@@ -31,8 +31,8 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                 <TextBlock Text="Timestamp:" Width="120" VerticalAlignment="Center" />
-                <DatePicker x:Name="TimestampInputDate" Width="150" />
-                <TextBox x:Name="TimestampInputTime" Width="50" Margin="5,0,0,0" Text="12:00" />
+                <DatePicker x:Name="TimestampInputDate" Width="150" VerticalAlignment="Center" />
+                <TextBox x:Name="TimestampInputTime" Width="50" Margin="5,0,0,0" Text="12:00" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
             </StackPanel>
             <Button Content="Register Passage" Width="150" Click="RegisterPassage_Click" />
         </StackPanel>
@@ -63,13 +63,26 @@
             <!-- Passages DataGrid -->
             <StackPanel Grid.Column="0" Margin="5">
                 <TextBlock Text="Passages" FontWeight="Bold" Margin="0,0,0,5" />
-                <DataGrid x:Name="PassagesDataGrid" AutoGenerateColumns="True" Margin="0,10,0,0" MaxHeight="450" />
+                <DataGrid x:Name="PassagesDataGrid" AutoGenerateColumns="False" Margin="0,10,0,0" MaxHeight="450" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="License Number" Binding="{Binding Vehicle.LicenseNumber}" />
+                        <DataGridTextColumn Header="Vehicle Type" Binding="{Binding Vehicle.VehicleType}" />
+                        <DataGridTextColumn Header="Timestamp" Binding="{Binding TimeStamp, StringFormat=yyyy-MM-dd HH:mm}" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </StackPanel>
 
             <!-- Daily Fees DataGrid -->
             <StackPanel Grid.Column="1" Margin="5">
                 <TextBlock Text="Daily Fees" FontWeight="Bold" Margin="0,0,0,5" />
-                <DataGrid x:Name="DailyFeesDataGrid" AutoGenerateColumns="True" Margin="0,10,0,0" MaxHeight="450" />
+                <DataGrid x:Name="DailyFeesDataGrid" AutoGenerateColumns="False" Margin="0,10,0,0" MaxHeight="450" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="License Number" Binding="{Binding Vehicle.LicenseNumber}" />
+                        <DataGridTextColumn Header="Vehicle Type" Binding="{Binding Vehicle.VehicleType}" />
+                        <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=yyyy-MM-dd}" />
+                        <DataGridTextColumn Header="Daily Fee" Binding="{Binding Fee}" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </StackPanel>
         </Grid>
     </Grid>
