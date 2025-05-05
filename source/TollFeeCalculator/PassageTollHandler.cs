@@ -53,7 +53,7 @@ namespace TollFeeCalculator
 
         public IOrderedEnumerable<VehiclePassage> GetListOfPassages(DateTime fromTimeStamp, DateTime toTimeStamp)
         {
-            // Check if start <= end
+            // Ensure start <= end
             if (fromTimeStamp > toTimeStamp)
             {
                 throw new ArgumentException(TIMESTAMPS_IN_WRONG_ORDER_EXCEPTION_MESSAGE);
@@ -62,7 +62,7 @@ namespace TollFeeCalculator
             var allPassages = new List<VehiclePassage>();
             foreach (var licenseNumber in _vehiclePassageRegistry.Keys)
             {
-                var passages = GetListOfPassages(licenseNumber, fromTimeStamp, toTimeStamp);
+                var passages = GetListOfPassagesWithTrustedParameters(licenseNumber, fromTimeStamp, toTimeStamp);
                 if (passages != null)
                 {
                     allPassages.AddRange(passages);
@@ -74,26 +74,19 @@ namespace TollFeeCalculator
 
         public IOrderedEnumerable<VehiclePassage> GetListOfPassages(string licenseNumber, DateTime fromTimeStamp, DateTime toTimeStamp)
         {
+            // Ensure the license number is valid
             if (string.IsNullOrEmpty(licenseNumber))
             {
                 throw new ArgumentException(INVALID_LICENSE_NUMBER_EXCEPTION_MESSAGE);
             }
 
-            // Check if the license number is valid (e.g., matches a specific format)
+            // Ensure start <= end
             if (fromTimeStamp > toTimeStamp)
             {
                 throw new ArgumentException(TIMESTAMPS_IN_WRONG_ORDER_EXCEPTION_MESSAGE);
             }
 
-            // Check if passages exist for the given license number
-            if (!_vehiclePassageRegistry.TryGetValue(licenseNumber, out var passages))
-            {
-                return (IOrderedEnumerable<VehiclePassage>)new List<VehiclePassage>(); 
-            }
-
-            return passages
-                .Where(x => x.TimeStamp >= fromTimeStamp && x.TimeStamp <= toTimeStamp)
-                .OrderBy(x => x.TimeStamp);
+            return GetListOfPassagesWithTrustedParameters(licenseNumber, fromTimeStamp, toTimeStamp);
         }
 
 
@@ -101,19 +94,19 @@ namespace TollFeeCalculator
         {
             var licenseNumber = passage.Vehicle.LicenseNumber;
             
-            // Check if the license number is invalid
+            // Ensure the license number is valid
             if (string.IsNullOrEmpty(licenseNumber))
             {
                 return false;
             }
             
-            // Check if the passage already has a registration
+            // Ensure the license number exists in the registry
             if (!_vehiclePassageRegistry.ContainsKey(licenseNumber))
             {
                 _vehiclePassageRegistry[licenseNumber] = new List<VehiclePassage>();
             }
 
-            // Only add the passage if it is not already present
+            // Ensure the passage is added if it is not already present
             // This prevents duplicate entries for the same vehicle and timestamp
             if (_vehiclePassageRegistry[licenseNumber].Exists(x => x.TimeStamp == passage.TimeStamp))
             {
@@ -124,6 +117,19 @@ namespace TollFeeCalculator
             return true; // Passage successfully registered
         }
 
+        private IOrderedEnumerable<VehiclePassage> GetListOfPassagesWithTrustedParameters(string licenseNumber, DateTime fromTimeStamp, DateTime toTimeStamp)
+        {
+            // If no passage exists for the given license number, return an empty list
+            if (!_vehiclePassageRegistry.TryGetValue(licenseNumber, out var passages))
+            {
+                return (IOrderedEnumerable<VehiclePassage>)new List<VehiclePassage>(); 
+            }
+
+            return passages
+                .Where(x => x.TimeStamp >= fromTimeStamp && x.TimeStamp <= toTimeStamp)
+                .OrderBy(x => x.TimeStamp);
+        }
+        
         private Vehicle CreateVehicle(string licenseNumber, VehicleType vehicleType)
         {
             return vehicleType switch
