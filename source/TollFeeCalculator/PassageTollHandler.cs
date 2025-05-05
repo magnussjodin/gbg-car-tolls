@@ -37,13 +37,15 @@ namespace TollFeeCalculator
             return numberOfAddedPassages;            
         }
 
-        // Method to register a vehicle passage
+        // Method to register a vehicle passage, normalizing the timestamp by setting seconds and milliseconds to 0
+        // This cappes down to the minute and avoids duplicate entries for the same vehicle and timestamp
         public bool RegisterPassage(string licenseNumber, VehicleType vehicleType, DateTime timeStamp)
         {
             var passage = new VehiclePassage()
             { 
                 Vehicle = CreateVehicle(licenseNumber, vehicleType),
-                TimeStamp = timeStamp
+                TimeStamp = timeStamp.AddSeconds(-timeStamp.Second)
+                                     .AddMilliseconds(-timeStamp.Millisecond)
             };
             
             return RegisterPassage(passage);

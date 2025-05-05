@@ -151,29 +151,48 @@ namespace TollFeeCalculatorTests
         }
 
         [Fact]
-        public void GetListOfPassages_ForSpecificLicenseNr_ShouldRaiseExceptionForNullOrEmptyLicenseNr()
+        public void RegisterPassage_ShouldCapRegisteredTimeStampToTheMinute()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            string licenseNumber = "ABC 123";
+            var vehicleType = GetValidVehicleType();
+            var timeStamp = new DateTime(2013, 1, 2, 7, 59, 59, 999);
+            var expectedTimeStamp = new DateTime(2013, 1, 2, 7, 59, 0, 0);
+
+            var result = passageTollHandler.RegisterPassage(licenseNumber, vehicleType, timeStamp);
+            Assert.True(result);
+
+            var passageList = passageTollHandler.GetListOfPassages(licenseNumber, expectedTimeStamp, expectedTimeStamp.AddMinutes(1));
+            Assert.True(passageList is not null && passageList.Any());
+            Assert.Equal(passageList.FirstOrDefault()?.TimeStamp, expectedTimeStamp);
+        }
+
+        [Fact]
+        public void RegisterPassage_ShouldFailAndTreatATimeStampThatDiffersOnlyOnTheSecondAsDuplicateEntry()
+        {
+            var passageTollHandler = new PassageTollHandler();
+            string licenseNumber = "ABC 123";
+            var vehicleType = GetValidVehicleType();
+            var timeStamp1 = DateTime.Now;
+            var timeStamp2 = timeStamp1.AddSeconds(1);
+
+            passageTollHandler.RegisterPassage(licenseNumber, vehicleType, timeStamp1);
+            var result = passageTollHandler.RegisterPassage(licenseNumber, vehicleType, timeStamp2);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void GetListOfPassages_ForSpecificLicenseNr_ShouldRaiseExceptionForEmptyLicenseNr()
         {
             var passageTollHandler = new PassageTollHandler();
             passageTollHandler.RegisterListOfPassages(GetVehiclePassageTestData());
 
-            string? licenseNumber = null;
+            string? licenseNumber = string.Empty;
             var fromTimeStamp = new DateTime(2013, 1, 2, 0, 0, 0);
             var toTimeStamp = new DateTime(2013, 1, 3, 0, 0, 0);
             IOrderedEnumerable<VehiclePassage>? list = null;
 
-            try
-            {
-                list = passageTollHandler.GetListOfPassages(licenseNumber, fromTimeStamp, toTimeStamp);
-            }
-            catch (System.Exception ex)
-            {
-                Assert.IsType<ArgumentException>(ex);
-                Assert.Equal(PassageTollHandler.INVALID_LICENSE_NUMBER_EXCEPTION_MESSAGE, ex.Message);
-            }
-            Assert.True(list is null || list.Count() == 0);
-
-            licenseNumber = string.Empty;
-            list = null;
             try
             {
                 list = passageTollHandler.GetListOfPassages(licenseNumber, fromTimeStamp, toTimeStamp);
