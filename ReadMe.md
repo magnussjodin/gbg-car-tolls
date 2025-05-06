@@ -41,6 +41,7 @@ The resulting app should be seen as a prototype of an idea, as it does not persi
    - **Added missing pieces in the framework**:
    - I now started to develop the missing pieces: A method to get out Daily fees from different dates, and everything about registering and listing out passages and the daily fees out of those passages. All out from the prioritized needs I had in mind. In a real-case scenario, this is ofc done in a more iterative way, to constantly push out new things.
    - After yet another half-a-day, I was finished with the final number of tests and functionality in the TollFeeCalculator project.
+   - One trap I went into in this phase, was to try to make Vehicle a key of the Dictionary. Reason is I wanted to make it possible to track if the same regnr was used for another vehicle type. But landed in the need for a EqualityComparer etc. In the end, the license nr - which should be unique - shown to be the best choice as key for the dictionary.
    -
    - **Building the visual app**:
    - I used the AI quite a lot in the final phase, where I got a lot of help to create the WPF app and XAML definitions and changes. It was fun to learn this new way of working closely to the AI companion!
