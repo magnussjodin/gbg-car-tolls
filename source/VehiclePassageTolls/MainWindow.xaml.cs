@@ -39,6 +39,11 @@ namespace VehiclePassageTolls
 
                 var timestamp = date.Add(time);
 
+                if (timestamp.Year != 2013)
+                {
+                    MessageBox.Show("NB! Only dates during 2013 are fully supported in this app version.");
+                }
+
                 _passageTollHandler.RegisterPassage(licenseNumber, vehicleType, timestamp);
                 Filter_Click(sender, e); // Refresh the data grids after registering a passage
             }
@@ -55,6 +60,12 @@ namespace VehiclePassageTolls
                 var licenseNumber = FilterLicenseNumberInput.Text;
                 var fromDate = FilterFromDate.SelectedDate ?? DateTime.MinValue;
                 var toDate = FilterToDate.SelectedDate ?? DateTime.MaxValue;
+
+                if (fromDate != DateTime.MinValue && fromDate.Year != 2013 || 
+                    toDate != DateTime.MaxValue && toDate.Year != 2013 )
+                {
+                    MessageBox.Show("NB! Only dates during 2013 are fully supported in this app version.");
+                }
 
                 // Filter passages
                 IOrderedEnumerable<VehiclePassage> passages;

@@ -16,7 +16,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Input Section -->
-        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0,0,0,10">
+        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0,0,0,15">
             <TextBlock Text="Register New Passage" FontWeight="Bold" />
             <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                 <TextBlock Text="License Number:" Width="120" VerticalAlignment="Center" />
@@ -34,11 +34,14 @@
                 <DatePicker x:Name="TimestampInputDate" Width="150" VerticalAlignment="Center" />
                 <TextBox x:Name="TimestampInputTime" Width="50" Margin="5,0,0,0" Text="12:00" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
             </StackPanel>
-            <Button Content="Register Passage" Width="150" Click="RegisterPassage_Click" />
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                <Button Content="Register Passage" Width="150" Click="RegisterPassage_Click" />
+                <TextBlock Text="(Only 2013 dates fully supported)" Width="200" Margin="20,0,0,0" />
+            </StackPanel>
         </StackPanel>
 
         <!-- Filter Section -->
-        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,0,0,10">
+        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,0,0,15">
             <TextBlock Text="Filter Passages and Daily Fees" FontWeight="Bold" />
             <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                 <TextBlock Text="License Number:" Width="120" VerticalAlignment="Center" />
@@ -50,7 +53,10 @@
                 <TextBlock Text="To:" Width="50" VerticalAlignment="Center" Margin="10,0,0,0" />
                 <DatePicker x:Name="FilterToDate" Width="150" />
             </StackPanel>
-            <Button Content="Filter" Width="150" Click="Filter_Click" />
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                <Button Content="Filter" Width="150" Click="Filter_Click" />
+                <TextBlock Text="(Only 2013 dates fully supported)" Width="200" Margin="20,0,0,0" />
+            </StackPanel>
         </StackPanel>
 
         <!-- Data Display Section -->
@@ -63,7 +69,7 @@
             <!-- Passages DataGrid -->
             <StackPanel Grid.Column="0" Margin="5">
                 <TextBlock Text="Passages" FontWeight="Bold" Margin="0,0,0,5" />
-                <DataGrid x:Name="PassagesDataGrid" AutoGenerateColumns="False" Margin="0,10,0,0" MaxHeight="450" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True">
+                <DataGrid x:Name="PassagesDataGrid" AutoGenerateColumns="False" Margin="0,10,0,0" MaxHeight="425" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="License Number" Binding="{Binding Vehicle.LicenseNumber}" />
                         <DataGridTextColumn Header="Vehicle Type" Binding="{Binding Vehicle.VehicleType}" />
@@ -75,7 +81,7 @@
             <!-- Daily Fees DataGrid -->
             <StackPanel Grid.Column="1" Margin="5">
                 <TextBlock Text="Daily Fees" FontWeight="Bold" Margin="0,0,0,5" />
-                <DataGrid x:Name="DailyFeesDataGrid" AutoGenerateColumns="False" Margin="0,10,0,0" MaxHeight="450" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True">
+                <DataGrid x:Name="DailyFeesDataGrid" AutoGenerateColumns="False" Margin="0,10,0,0" MaxHeight="425" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="License Number" Binding="{Binding Vehicle.LicenseNumber}" />
                         <DataGridTextColumn Header="Vehicle Type" Binding="{Binding Vehicle.VehicleType}" />
