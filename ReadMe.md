@@ -2,6 +2,7 @@
 
 This document explains how to execute the application and provides an overview of the steps I followed to build it.
 The resulting app should be seen as a prototype of an idea, as it does not persist any registered passages and only works properly for dates in 2013.
+(Added 2025-05-07) I came to think of, that the app is actually mostly treating success scenarios in a good way. And even if the error handling is found in the framework, I think some of it might be silently swallowed by this app, especially in the registration part. The app could though be used for showcasing the business concept.
 
 ## How to Execute the Application
 
